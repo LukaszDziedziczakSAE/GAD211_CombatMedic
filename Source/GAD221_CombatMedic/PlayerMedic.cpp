@@ -3,6 +3,7 @@
 
 #include "PlayerMedic.h"
 #include "MedicInteraction.h"
+#include "Camera/CameraComponent.h"
 
 // Sets default values
 APlayerMedic::APlayerMedic()
@@ -11,6 +12,9 @@ APlayerMedic::APlayerMedic()
 	PrimaryActorTick.bCanEverTick = true;
 
 	MedicInteraction = CreateDefaultSubobject<UMedicInteraction>("Medic Interaction");
+
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera Component"));
+	CameraComponent->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned

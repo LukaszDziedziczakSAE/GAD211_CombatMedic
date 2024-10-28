@@ -24,5 +24,10 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class ASoldier* Patient;
+
+	UFUNCTION(BlueprintCallable)
+	void Interact();
+
 };

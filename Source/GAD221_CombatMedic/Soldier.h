@@ -22,6 +22,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsDowned;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USphereComponent* InteractionProximity;
+
+	UFUNCTION()
+	virtual void OnOverlapBegin(class UPrimitiveComponent* newComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -31,4 +40,7 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	bool IsDowned() { return bIsDowned; }
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UCameraComponent* CameraComponent;
 };

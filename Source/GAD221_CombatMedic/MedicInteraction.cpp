@@ -32,3 +32,8 @@ void UMedicInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	// ...
 }
 
+void UMedicInteraction::Interact()
+{
+
+}
+
