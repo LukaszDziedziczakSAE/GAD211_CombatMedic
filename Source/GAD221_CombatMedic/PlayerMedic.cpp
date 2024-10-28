@@ -2,6 +2,7 @@
 
 
 #include "PlayerMedic.h"
+#include "MedicInteraction.h"
 
 // Sets default values
 APlayerMedic::APlayerMedic()
@@ -9,6 +10,7 @@ APlayerMedic::APlayerMedic()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	MedicInteraction = CreateDefaultSubobject<UMedicInteraction>("Medic Interaction");
 }
 
 // Called when the game starts or when spawned
