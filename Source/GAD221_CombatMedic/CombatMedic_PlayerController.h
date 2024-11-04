@@ -46,4 +46,10 @@ protected:
 	UFUNCTION()
 	void Interact(const FInputActionValue& Value);
 	
+public:
+	UFUNCTION()
+	void SwitchToPatientCamera();
+
+	UFUNCTION()
+	void SwitchToBackToMainCamera();
 };

@@ -20,6 +20,15 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	UPROPERTY()
+	bool bGivingMedicalAid;
+
+	UPROPERTY()
+	class ACombatMedic_HUD* HUD;
+
+	UPROPERTY()
+	class APlayerMedic* Player;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -30,4 +39,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Interact();
 
+	UFUNCTION(BlueprintPure)
+	bool GivingMedicalAid() { return bGivingMedicalAid; }
 };

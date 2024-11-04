@@ -4,6 +4,7 @@
 #include "PlayerMedic.h"
 #include "MedicInteraction.h"
 #include "Camera/CameraComponent.h"
+#include "CombatMedic_PlayerController.h"
 
 // Sets default values
 APlayerMedic::APlayerMedic()
@@ -22,6 +23,7 @@ void APlayerMedic::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	PlayerController = Cast<ACombatMedic_PlayerController>(GetController());
 }
 
 // Called every frame
@@ -36,5 +38,13 @@ void APlayerMedic::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void APlayerMedic::Interact()
+{
+	if (MedicInteraction->Patient != nullptr)
+	{
+		MedicInteraction->Interact();
+	}
 }
 

@@ -3,3 +3,10 @@
 
 #include "CombatMedic_HUD.h"
 
+void ACombatMedic_HUD::ShowMedicInterface_Implementation()
+{
+}
+
+void ACombatMedic_HUD::ShowCombatHUD_Implementation()
+{
+}

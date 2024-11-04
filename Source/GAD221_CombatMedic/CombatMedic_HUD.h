@@ -13,5 +13,12 @@ UCLASS()
 class GAD221_COMBATMEDIC_API ACombatMedic_HUD : public AHUD
 {
 	GENERATED_BODY()
+
+public:
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ShowMedicInterface();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ShowCombatHUD();
 	
 };

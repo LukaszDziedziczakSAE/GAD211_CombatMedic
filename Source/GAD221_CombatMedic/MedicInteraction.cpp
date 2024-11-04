@@ -2,6 +2,10 @@
 
 
 #include "MedicInteraction.h"
+#include "CombatMedic_HUD.h"
+#include "PlayerMedic.h"
+#include "CombatMedic_PlayerController.h"
+#include "Soldier.h"
 
 // Sets default values for this component's properties
 UMedicInteraction::UMedicInteraction()
@@ -19,8 +23,8 @@ void UMedicInteraction::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
+	HUD = Cast<ACombatMedic_HUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	Player = Cast<APlayerMedic>(GetOwner());
 }
 
 
@@ -34,6 +38,20 @@ void UMedicInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 void UMedicInteraction::Interact()
 {
+	if (HUD == nullptr || Patient == nullptr) return;
 
+	if (!bGivingMedicalAid)
+	{
+		bGivingMedicalAid = true;
+		HUD->ShowMedicInterface();
+		Player->PlayerController->SwitchToPatientCamera();
+	}
+
+	else
+	{
+		bGivingMedicalAid = false;
+		HUD->ShowCombatHUD();
+		Player->PlayerController->SwitchToBackToMainCamera();
+	}
 }
 
