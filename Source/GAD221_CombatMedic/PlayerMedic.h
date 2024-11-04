@@ -36,6 +36,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class ACombatMedic_PlayerController* PlayerController;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UMedicInventory* MedicInventory;
+
 	UFUNCTION(BlueprintCallable)
 	void Interact();
 };

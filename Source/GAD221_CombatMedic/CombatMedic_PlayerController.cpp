@@ -91,9 +91,13 @@ void ACombatMedic_PlayerController::SwitchToPatientCamera()
 {
 	AActor* Patient = Cast<AActor>(PlayerMedic->MedicInteraction->Patient);
 	SetViewTargetWithBlend(Patient, 0.0f, EViewTargetBlendFunction::VTBlend_EaseInOut);
+	bShowMouseCursor = true;
+	SetInputMode(FInputModeUIOnly());
 }
 
 void ACombatMedic_PlayerController::SwitchToBackToMainCamera()
 {
 	SetViewTargetWithBlend(PlayerMedic, 0.0f, EViewTargetBlendFunction::VTBlend_EaseInOut);
+	bShowMouseCursor = false;
+	SetInputMode(FInputModeGameOnly());
 }

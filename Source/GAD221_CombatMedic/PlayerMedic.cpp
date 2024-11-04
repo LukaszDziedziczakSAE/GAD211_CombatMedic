@@ -5,6 +5,7 @@
 #include "MedicInteraction.h"
 #include "Camera/CameraComponent.h"
 #include "CombatMedic_PlayerController.h"
+#include "MedicInventory.h"
 
 // Sets default values
 APlayerMedic::APlayerMedic()
@@ -12,10 +13,12 @@ APlayerMedic::APlayerMedic()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	MedicInteraction = CreateDefaultSubobject<UMedicInteraction>("Medic Interaction");
+	MedicInteraction = CreateDefaultSubobject<UMedicInteraction>(TEXT("Medic Interaction"));
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera Component"));
 	CameraComponent->SetupAttachment(GetRootComponent());
+
+	MedicInventory = CreateDefaultSubobject<UMedicInventory>(TEXT("Medic Inventory"));
 }
 
 // Called when the game starts or when spawned
