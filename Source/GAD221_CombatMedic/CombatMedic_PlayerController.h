@@ -34,6 +34,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class UInputAction* IA_Interact;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	class UInputAction* IA_LeftMouse;
+
 	UFUNCTION()
 	virtual void SetupInputComponent() override;
 
@@ -45,6 +48,9 @@ protected:
 
 	UFUNCTION()
 	void Interact(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void LeftMouseUp(const FInputActionValue& Value);
 	
 public:
 	UFUNCTION()
@@ -52,4 +58,7 @@ public:
 
 	UFUNCTION()
 	void SwitchToBackToMainCamera();
+
+	UFUNCTION(BlueprintCallable)
+	UShapeComponent* ComponentUnderMouse();
 };

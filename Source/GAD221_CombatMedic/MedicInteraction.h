@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "EMedicalItemType.h"
+#include "FMedicalAffect.h"
 #include "MedicInteraction.generated.h"
 
 
@@ -20,7 +22,7 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	bool bGivingMedicalAid;
 
 	UPROPERTY()
@@ -28,6 +30,9 @@ protected:
 
 	UPROPERTY()
 	class APlayerMedic* Player;
+
+	UPROPERTY(VisibleAnywhere)
+	TEnumAsByte<EMedicalItemType> InteractionType;
 
 public:	
 	// Called every frame
@@ -40,5 +45,20 @@ public:
 	void Interact();
 
 	UFUNCTION(BlueprintPure)
-	bool GivingMedicalAid() { return bGivingMedicalAid; }
+	bool GivingMedicalAid();
+
+	UFUNCTION(BlueprintCallable)
+	void StartMedicalItemApplication(TEnumAsByte<EMedicalItemType> ItemType);
+
+	UFUNCTION(BlueprintCallable)
+	void EndMedicalItemApplication(class UShapeComponent* HitShape);
+
+	UFUNCTION(BlueprintPure)
+	TEnumAsByte<EMedicalItemType> GetInteractionType() { return InteractionType; }
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FMedicalAffect> MedicalAffects;
+
+	UFUNCTION(BlueprintCallable)
+	float AmountByAffect(TEnumAsByte<EMedicalItemType> ItemType, TEnumAsByte<EBodyPart> BodyPart);
 };

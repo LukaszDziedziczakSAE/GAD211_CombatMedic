@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "FInjury.h"
 #include "Soldier.generated.h"
 
 UCLASS()
@@ -31,6 +32,49 @@ protected:
 	UFUNCTION()
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	struct FInjury Injury;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MaxHealth{ 1000.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CurrentHealth{ 1000.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UBoxComponent* TorsoColider;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UCapsuleComponent* NeckColider;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USphereComponent* HeadColider;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USphereComponent* RightShoulderColider;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UCapsuleComponent* RightArmColider;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USphereComponent* LeftShoulderColider;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UCapsuleComponent* LeftArmColider;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USphereComponent* RightHipColider;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UCapsuleComponent* RightLegColider;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USphereComponent* LeftHipColider;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UCapsuleComponent* LeftLegColider;
+
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -43,4 +87,22 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UCameraComponent* CameraComponent;
+
+	UFUNCTION(BlueprintCallable)
+	void SetInjury(FInjury NewInjury);
+
+	UFUNCTION(BlueprintCallable)
+	FInjury GetInjury() { return Injury; }
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName SoldierName{TEXT("SoldierName")};
+
+	UFUNCTION(BlueprintPure)
+	float HealthPercentage() { return CurrentHealth / MaxHealth; }
+
+	UFUNCTION(BlueprintCallable)
+	TEnumAsByte<EBodyPart> BodyPartFromShape(UShapeComponent* Shape);
+
+	UFUNCTION(BlueprintCallable)
+	void HealInjury(float Amount);
 };

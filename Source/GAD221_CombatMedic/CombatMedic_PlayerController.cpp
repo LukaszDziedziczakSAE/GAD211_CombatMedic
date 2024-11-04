@@ -8,6 +8,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Soldier.h"
 #include "MedicInteraction.h"
+#include "Components/ShapeComponent.h"
 
 void ACombatMedic_PlayerController::BeginPlay()
 {
@@ -49,6 +50,7 @@ void ACombatMedic_PlayerController::SetupInputComponent()
 		Input->BindAction(IA_Move, ETriggerEvent::Triggered, this, &ACombatMedic_PlayerController::Move);
 		Input->BindAction(IA_Look, ETriggerEvent::Triggered, this, &ACombatMedic_PlayerController::Look);
 		Input->BindAction(IA_Interact, ETriggerEvent::Started, this, &ACombatMedic_PlayerController::Interact);
+		Input->BindAction(IA_LeftMouse, ETriggerEvent::Completed, this, &ACombatMedic_PlayerController::LeftMouseUp);
 	}
 
 	else
@@ -87,12 +89,18 @@ void ACombatMedic_PlayerController::Interact(const FInputActionValue& Value)
 	PlayerMedic->Interact();
 }
 
+void ACombatMedic_PlayerController::LeftMouseUp(const FInputActionValue& Value)
+{
+	if (PlayerMedic == nullptr) return;
+	if (PlayerMedic->MedicInteraction->GivingMedicalAid()) PlayerMedic->MedicInteraction->EndMedicalItemApplication(ComponentUnderMouse());
+}
+
 void ACombatMedic_PlayerController::SwitchToPatientCamera()
 {
 	AActor* Patient = Cast<AActor>(PlayerMedic->MedicInteraction->Patient);
 	SetViewTargetWithBlend(Patient, 0.0f, EViewTargetBlendFunction::VTBlend_EaseInOut);
 	bShowMouseCursor = true;
-	SetInputMode(FInputModeUIOnly());
+	SetInputMode(FInputModeGameAndUI());
 }
 
 void ACombatMedic_PlayerController::SwitchToBackToMainCamera()
@@ -100,4 +108,27 @@ void ACombatMedic_PlayerController::SwitchToBackToMainCamera()
 	SetViewTargetWithBlend(PlayerMedic, 0.0f, EViewTargetBlendFunction::VTBlend_EaseInOut);
 	bShowMouseCursor = false;
 	SetInputMode(FInputModeGameOnly());
+}
+
+UShapeComponent* ACombatMedic_PlayerController::ComponentUnderMouse()
+{
+	FHitResult Hit;
+	FVector MouseWorldLocation;
+	FVector MouseWorldDirection;
+	DeprojectMousePositionToWorld(MouseWorldLocation, MouseWorldDirection);
+	FVector TraceStart = MouseWorldLocation;
+	FVector TraceEnd = MouseWorldLocation + MouseWorldDirection * 1000.0f;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+	QueryParams.AddIgnoredActor(PlayerMedic);
+	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_GameTraceChannel1, QueryParams);
+
+	if (Hit.bBlockingHit)
+	{
+		UShapeComponent* ShapeComponent = Cast<UShapeComponent>(Hit.Component);
+
+		if (ShapeComponent != nullptr) return ShapeComponent;
+	}
+
+	return nullptr;
 }

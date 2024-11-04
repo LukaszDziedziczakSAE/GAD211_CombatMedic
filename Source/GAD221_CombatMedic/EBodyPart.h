@@ -7,6 +7,7 @@
 UENUM(BlueprintType)
 enum EBodyPart
 {
+	None,
 	Torso,
 	Head,
 	Neck,

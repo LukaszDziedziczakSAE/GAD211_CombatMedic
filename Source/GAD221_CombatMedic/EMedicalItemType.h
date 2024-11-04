@@ -11,5 +11,7 @@ enum EMedicalItemType
 	Bandage,
 	Tourniquet,
 	Gauze,
-	ChestSeal
+	ChestSeal,
+	Scissors,
+	PainKiller
 };
