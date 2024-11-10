@@ -9,6 +9,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 
 
 // Sets default values
@@ -24,7 +25,6 @@ ASoldier::ASoldier()
 	InteractionProximity->OnComponentBeginOverlap.AddDynamic(this, &ASoldier::OnOverlapBegin);
 	InteractionProximity->OnComponentEndOverlap.AddDynamic(this, &ASoldier::OnOverlapEnd);
 	InteractionProximity->SetCanEverAffectNavigation(false);
-
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera Component"));
 	CameraComponent->SetupAttachment(GetRootComponent());
@@ -129,6 +129,49 @@ ASoldier::ASoldier()
 	LeftLegColider->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECollisionResponse::ECR_Block);
 	LeftLegColider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	LeftLegColider->SetCanEverAffectNavigation(false);
+
+	//TopMesh->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Top"));
+	//TopMesh->SetupAttachment(GetMesh());
+
+	//Bottom->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Bottom"));
+	//Bottom->SetupAttachment(GetMesh());
+
+	//Shoes->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Shoes"));
+	//Shoes->SetupAttachment(GetMesh());
+
+	//Arms->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Arms"));
+	//Arms->SetupAttachment(GetMesh());
+
+	//Vest->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Vest"));
+	//Vest->SetupAttachment(GetMesh());
+
+	//VestAccesories->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("VestAccesories"));
+	//VestAccesories->SetupAttachment(GetMesh());
+
+	//Belt->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Belt"));
+	//Belt->SetupAttachment(GetMesh());
+
+	//Helmet->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Helmet"));
+	//Helmet->SetupAttachment(GetMesh());
+
+	//KneepadL->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("KneepadL"));
+	//KneepadL->SetupAttachment(GetMesh());
+
+	//KneepadR->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("KneepadR"));
+	//KneepadR->SetupAttachment(GetMesh());
+
+	//Headset->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Headset"));
+	//Headset->SetupAttachment(GetMesh());
+
+	//HelmetStrap->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HelmetStrap"));
+	//HelmetStrap->SetupAttachment(GetMesh());
+
+	//Goggles->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Goggles"));
+	//Goggles->SetupAttachment(GetMesh());
+
+	//Weapon->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+	//Weapon->SetupAttachment(GetMesh());
+
 }
 
 // Called when the game starts or when spawned
@@ -142,7 +185,7 @@ void ASoldier::BeginPlay()
 
 void ASoldier::OnOverlapBegin(UPrimitiveComponent* newComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!bIsDowned) return;
+	if (!bIsDowned || SoldierSide != Allied) return;
 
 	APlayerMedic* Player = Cast<APlayerMedic>(OtherActor);
 	if (Player == nullptr) return;
@@ -152,7 +195,7 @@ void ASoldier::OnOverlapBegin(UPrimitiveComponent* newComp, AActor* OtherActor, 
 
 void ASoldier::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (!bIsDowned) return;
+	if (!bIsDowned || SoldierSide != Allied) return;
 	APlayerMedic* Player = Cast<APlayerMedic>(OtherActor);
 	if (Player == nullptr) return;
 
