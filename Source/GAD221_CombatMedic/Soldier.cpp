@@ -10,6 +10,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "SoldierCombat.h"
 
 
 // Sets default values
@@ -172,6 +173,7 @@ ASoldier::ASoldier()
 	//Weapon->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	//Weapon->SetupAttachment(GetMesh());
 
+	Combat = CreateDefaultSubobject<USoldierCombat>(TEXT("Combat"));
 }
 
 // Called when the game starts or when spawned
@@ -222,8 +224,8 @@ void ASoldier::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ASoldier::SetInjury(FInjury NewInjury)
 {
-	if (bHasBeenInjured) return;
-	bHasBeenInjured = true;
+	/*if (bHasBeenInjured) return;
+	bHasBeenInjured = true;*/
 	Injury = NewInjury;
 	bIsDowned = true;
 }
@@ -261,5 +263,9 @@ void ASoldier::HealInjury(float Amount)
 		Injury.BodyPart = None;
 		bIsDowned = false;
 	}
+}
+
+void ASoldier::FireWeapon_Implementation()
+{
 }
 
