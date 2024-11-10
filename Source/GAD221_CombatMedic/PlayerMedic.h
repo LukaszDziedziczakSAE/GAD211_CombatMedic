@@ -41,5 +41,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void Interact();
+
+	UFUNCTION(BlueprintCallable)
+	bool IsProvidingMedicalAid();
 };
 

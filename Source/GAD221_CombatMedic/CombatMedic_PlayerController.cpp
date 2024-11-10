@@ -61,7 +61,7 @@ void ACombatMedic_PlayerController::SetupInputComponent()
 
 void ACombatMedic_PlayerController::Move(const FInputActionValue& Value)
 {
-	if (PlayerMedic == nullptr) return;
+	if (PlayerMedic == nullptr || PlayerMedic->IsProvidingMedicalAid()) return;
 
 	FRotator CharacterRotation = PlayerMedic->GetControlRotation();
 
@@ -98,14 +98,14 @@ void ACombatMedic_PlayerController::LeftMouseUp(const FInputActionValue& Value)
 void ACombatMedic_PlayerController::SwitchToPatientCamera()
 {
 	AActor* Patient = Cast<AActor>(PlayerMedic->MedicInteraction->Patient);
-	SetViewTargetWithBlend(Patient, 0.0f, EViewTargetBlendFunction::VTBlend_EaseInOut);
+	SetViewTargetWithBlend(Patient, CameraTransitionTime, EViewTargetBlendFunction::VTBlend_Linear);
 	bShowMouseCursor = true;
 	SetInputMode(FInputModeGameAndUI());
 }
 
 void ACombatMedic_PlayerController::SwitchToBackToMainCamera()
 {
-	SetViewTargetWithBlend(PlayerMedic, 0.0f, EViewTargetBlendFunction::VTBlend_EaseInOut);
+	SetViewTargetWithBlend(PlayerMedic, CameraTransitionTime, EViewTargetBlendFunction::VTBlend_Linear);
 	bShowMouseCursor = false;
 	SetInputMode(FInputModeGameOnly());
 }

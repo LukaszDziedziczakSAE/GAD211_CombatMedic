@@ -34,6 +34,15 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TEnumAsByte<EMedicalItemType> InteractionType;
 
+	UPROPERTY()
+	float ApplicationCurrent;
+
+	UPROPERTY()
+	float ApplicationMax{ 1.0f };
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TEnumAsByte<EBodyPart> BodyPartSelected;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -53,12 +62,21 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void EndMedicalItemApplication(class UShapeComponent* HitShape);
 
+	UFUNCTION(BlueprintCallable)
+	void CompleteMedicalItemApplication();
+
 	UFUNCTION(BlueprintPure)
 	TEnumAsByte<EMedicalItemType> GetInteractionType() { return InteractionType; }
+
+	UFUNCTION(BlueprintPure)
+	TEnumAsByte<EBodyPart> GetBodyPartSelected() { return BodyPartSelected; }
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FMedicalAffect> MedicalAffects;
 
 	UFUNCTION(BlueprintCallable)
 	float AmountByAffect(TEnumAsByte<EMedicalItemType> ItemType, TEnumAsByte<EBodyPart> BodyPart);
+
+	UFUNCTION(BlueprintPure)
+	float GetApplicationProgress() { return ApplicationCurrent / ApplicationMax; }
 };

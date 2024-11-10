@@ -51,3 +51,14 @@ void APlayerMedic::Interact()
 	}
 }
 
+bool APlayerMedic::IsProvidingMedicalAid()
+{
+	if (MedicInteraction == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PlayerMedic missing MedicInteraction"));
+		return false;
+	}
+
+	return MedicInteraction->GivingMedicalAid();
+}
+

@@ -26,6 +26,8 @@ void UMedicInteraction::BeginPlay()
 
 	HUD = Cast<ACombatMedic_HUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 	Player = Cast<APlayerMedic>(GetOwner());
+
+	ApplicationCurrent = ApplicationMax;
 }
 
 
@@ -34,21 +36,30 @@ void UMedicInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	if (ApplicationCurrent < ApplicationMax)
+	{
+		ApplicationCurrent += DeltaTime;
+
+		if (ApplicationCurrent >= ApplicationMax)
+		{
+			ApplicationCurrent = ApplicationMax;
+			CompleteMedicalItemApplication();
+		}
+	}
 }
 
 void UMedicInteraction::Interact()
 {
 	if (HUD == nullptr || Patient == nullptr) return;
 
-	if (!bGivingMedicalAid)
+	if (!bGivingMedicalAid && Patient->IsDowned())
 	{
 		bGivingMedicalAid = true;
 		HUD->ShowMedicInterface();
 		Player->PlayerController->SwitchToPatientCamera();
 	}
 
-	else
+	else if (bGivingMedicalAid)
 	{
 		bGivingMedicalAid = false;
 		HUD->ShowCombatHUD();
@@ -58,16 +69,20 @@ void UMedicInteraction::Interact()
 
 bool UMedicInteraction::GivingMedicalAid()
 {
-	return bGivingMedicalAid && InteractionType != None;
+	return bGivingMedicalAid;
 }
 
 void UMedicInteraction::StartMedicalItemApplication(TEnumAsByte<EMedicalItemType> ItemType)
 {
+	if (BodyPartSelected != None) return;
+
 	InteractionType = ItemType;
 }
 
 void UMedicInteraction::EndMedicalItemApplication(UShapeComponent* HitShape)
 {
+	if (BodyPartSelected != None) return;
+
 	if (HitShape != nullptr)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("Apply to %s"), *HitShape->GetName());
@@ -76,16 +91,32 @@ void UMedicInteraction::EndMedicalItemApplication(UShapeComponent* HitShape)
 
 		if (BodyPart == Patient->GetInjury().BodyPart)
 		{
-			Patient->HealInjury(AmountByAffect(InteractionType, BodyPart));
+			BodyPartSelected = BodyPart;
+			ApplicationCurrent = 0;
 		}
-
 	}
 	
-	else UE_LOG(LogTemp, Warning, TEXT("EndMedicalItemApplication"));
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("EndMedicalItemApplication"));
 
+		InteractionType = NoType;
+	}
+}
 
+void UMedicInteraction::CompleteMedicalItemApplication()
+{
+	if (BodyPartSelected == None) return;
 
+	Patient->HealInjury(AmountByAffect(InteractionType, BodyPartSelected));
 
+	if (!Patient->IsDowned())
+	{
+		Interact();
+		Patient = nullptr;
+	}
+
+	BodyPartSelected = None;
 	InteractionType = NoType;
 }
 

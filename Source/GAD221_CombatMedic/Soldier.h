@@ -42,6 +42,15 @@ protected:
 	float CurrentHealth{ 1000.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float WalkingSpeed{ 200 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float RunningSpeed{ 600 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CrouchingWalkSpeed{ 180 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UBoxComponent* TorsoColider;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -92,6 +101,9 @@ public:
 	void SetInjury(FInjury NewInjury);
 
 	UFUNCTION(BlueprintCallable)
+	void SetRandomInjury();
+
+	UFUNCTION(BlueprintCallable)
 	FInjury GetInjury() { return Injury; }
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -105,4 +117,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void HealInjury(float Amount);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class ASoldierWaypoint* FightingPosition1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bHasBeenInjured;
 };

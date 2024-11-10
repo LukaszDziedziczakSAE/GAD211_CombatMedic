@@ -51,6 +51,9 @@ protected:
 
 	UFUNCTION()
 	void LeftMouseUp(const FInputActionValue& Value);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CameraTransitionTime;
 	
 public:
 	UFUNCTION()
