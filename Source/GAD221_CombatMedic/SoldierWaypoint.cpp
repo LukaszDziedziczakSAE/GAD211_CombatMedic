@@ -52,7 +52,7 @@ void ASoldierWaypoint::OnOverlapBegin(UPrimitiveComponent* newComp, AActor* Othe
 void ASoldierWaypoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	ASoldier* Soldier = Cast<ASoldier>(OtherActor);
-	if (Soldier == nullptr || SoldierInOverlap == nullptr) return;
+	if (Soldier == nullptr || Soldier->IsInCombat() || SoldierInOverlap == nullptr) return;
 	
 	if (SoldierInOverlap == Soldier) SoldierInOverlap = nullptr;
 

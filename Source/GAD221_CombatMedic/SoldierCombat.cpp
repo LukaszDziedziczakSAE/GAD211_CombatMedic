@@ -38,8 +38,25 @@ void USoldierCombat::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 void USoldierCombat::SetFightingPosition(ASoldierWaypoint* Waypoint)
 {
+	if (Waypoint == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Missing ASoldierWaypoint reference in SoldierCombat for setting FightingPosition"));
+		return;
+	}
+
 	FightingPosition = Waypoint;
-	if (Soldier->SoldierAI() != nullptr) Soldier->SoldierAI()->SetWaypoint(FightingPosition->GetActorLocation());
+	if (Soldier == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Missing Soldier reference in SoldierCombat"));
+		return;
+	}
+	if (Soldier->SoldierAI() == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Missing Soldier AI reference in SoldierCombat"));
+		return;
+	}
+		
+	Soldier->SoldierAI()->SetWaypoint(FightingPosition->GetActorLocation());
 }
 
 void USoldierCombat::ClearWaypoint()
@@ -92,7 +109,7 @@ void USoldierCombat::LookAtOpponent()
 
 	FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(Soldier->GetActorLocation(), Opponent->GetActorLocation());
 
-	Soldier->SetActorRotation(LookAtRot);
+	Soldier->SetActorRotation(LookAtRot, ETeleportType::TeleportPhysics);
 }
 
 void USoldierCombat::TrySetOpponent()

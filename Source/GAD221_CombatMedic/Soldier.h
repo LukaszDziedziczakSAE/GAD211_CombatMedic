@@ -154,6 +154,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsDowned() { return bIsDowned; }
 
+	UFUNCTION(BlueprintPure)
+	bool IsInCombat() { return bIsInCombat; }
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UCameraComponent* CameraComponent;
 
