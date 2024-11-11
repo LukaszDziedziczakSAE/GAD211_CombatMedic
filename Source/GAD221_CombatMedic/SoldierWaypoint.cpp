@@ -2,6 +2,7 @@
 
 
 #include "SoldierWaypoint.h"
+#include "Soldier.h"
 
 // Sets default values
 ASoldierWaypoint::ASoldierWaypoint()
