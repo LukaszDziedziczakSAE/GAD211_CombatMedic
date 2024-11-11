@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Soldier.h"
 #include "SoldierWaypoint.generated.h"
 
 UCLASS()
@@ -23,7 +24,10 @@ protected:
 	int WaveIndex;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TEnumAsByte<enum ESoldierSide> Side;
+	TEnumAsByte<ESoldierSide> Side;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float CrouchingAmmount;
 
 public:	
 	// Called every frame
