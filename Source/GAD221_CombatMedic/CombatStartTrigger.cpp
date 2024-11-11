@@ -3,6 +3,8 @@
 
 #include "CombatStartTrigger.h"
 #include "Components/BoxComponent.h"
+#include "Soldier.h"
+#include "CombatMedicGameMode.h"
 
 // Sets default values
 ACombatStartTrigger::ACombatStartTrigger()
@@ -15,6 +17,7 @@ ACombatStartTrigger::ACombatStartTrigger()
 	Proximity->OnComponentBeginOverlap.AddDynamic(this, &ACombatStartTrigger::OnOverlapBegin);
 	Proximity->OnComponentEndOverlap.AddDynamic(this, &ACombatStartTrigger::OnOverlapEnd);
 	Proximity->SetCanEverAffectNavigation(false);
+	Proximity->SetBoxExtent(FVector{400, 200, 100});
 }
 
 // Called when the game starts or when spawned
@@ -26,7 +29,10 @@ void ACombatStartTrigger::BeginPlay()
 
 void ACombatStartTrigger::OnOverlapBegin(UPrimitiveComponent* newComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	ASoldier* Soldier = Cast<ASoldier>(OtherActor);
+	if (Soldier == nullptr) return;
 
+	Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->BeginCombat(CombatIndex);
 }
 
 void ACombatStartTrigger::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)

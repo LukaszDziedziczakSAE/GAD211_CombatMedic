@@ -18,15 +18,27 @@ protected:
 	TArray<class ASoldier*> AllySoldiers;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<class ASoldier*> EnemySoldiers;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<class ASoldierWaypoint*> TravelWaypoints;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<class ASoldierWaypoint*> CombatPositions;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<class AEnemySpawner*> EnemySpawners;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	ASoldierWaypoint* FirstTravelWaypoint;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int CombatIndex;
 
 public:
 	UFUNCTION(BlueprintCallable)
 	ASoldierWaypoint* GetFirstTravelWaypoint() { return FirstTravelWaypoint; }
+
+	UFUNCTION(BlueprintCallable)
+	void BeginCombat(int CombaIndex);
 };

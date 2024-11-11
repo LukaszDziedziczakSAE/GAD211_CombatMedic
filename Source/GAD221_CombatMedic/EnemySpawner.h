@@ -36,5 +36,5 @@ public:
 	int GetFightIndex() { return FightIndex; }
 
 	UFUNCTION(BlueprintCallable)
-	void SpawnEnemy();
+	ASoldier* SpawnEnemy();
 };

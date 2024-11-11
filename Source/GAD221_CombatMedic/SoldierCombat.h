@@ -23,21 +23,40 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class ASoldier* Soldier;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class ASoldierWaypoint* FightingPosition;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	ASoldier* Opponent;
 
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ASoldier* Opponent;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float ChanceToHit{ 0 };
+
+	UFUNCTION(BlueprintCallable)
+	void SetFightingPosition(ASoldierWaypoint* Waypoint);
+
+	UFUNCTION(BlueprintCallable)
+	void ClearWaypoint();
+
+	UFUNCTION(BlueprintPure)
+	ASoldierWaypoint* GetFightingPosition(){ return FightingPosition; }
 
 	UFUNCTION(BlueprintCallable)
 	void Fire();
 
 	UFUNCTION(BlueprintPure)
 	bool OpponentIsDown();
+
+	UFUNCTION(BlueprintCallable)
+	void SetOpponentSoldier(ASoldier* OpponentSoldier);
+
+	UFUNCTION(BlueprintCallable)
+	void LookAtOpponent();
+
+	UFUNCTION(BlueprintCallable)
+	void TrySetOpponent();
 };

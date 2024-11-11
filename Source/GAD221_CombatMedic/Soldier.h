@@ -197,14 +197,11 @@ public:
 	void SetCrouching(float Value);
 
 	UFUNCTION(BlueprintCallable)
-	void EngageCombat();
+	void EngageCombat(ASoldierWaypoint* FightingPosition);
 
 	UFUNCTION(BlueprintCallable)
 	void DisengageCombat();
 
 	UFUNCTION(BlueprintCallable)
 	ASoldierAIController* SoldierAI() { return AI; }
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	class ASoldierWaypoint* FirstWaypoint;
 };

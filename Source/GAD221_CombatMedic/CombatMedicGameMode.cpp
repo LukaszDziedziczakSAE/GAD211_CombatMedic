@@ -6,6 +6,7 @@
 #include "SoldierWaypoint.h"
 #include "Kismet/GameplayStatics.h"
 #include "SoldierAIController.h"
+#include "EnemySpawner.h"
 
 void ACombatMedicGameMode::BeginPlay()
 {
@@ -47,4 +48,47 @@ void ACombatMedicGameMode::BeginPlay()
 		}
 	}
 
+	TArray<AActor*> SpawnerActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemySpawner::StaticClass(), SpawnerActors);
+
+	for (AActor* SpawnerActor : SpawnerActors)
+	{
+		AEnemySpawner* Spawner = Cast<AEnemySpawner>(SpawnerActor);
+		if (Spawner == nullptr) continue;
+
+		EnemySpawners.Add(Spawner);
+	}
+}
+
+void ACombatMedicGameMode::BeginCombat(int Index)
+{
+	if (CombatIndex == Index) return;
+	CombatIndex = Index;
+
+	TArray<ASoldierWaypoint*> AllyCombatPositions;
+	for (ASoldierWaypoint* SoldierWaypoint : CombatPositions)
+	{
+		if (SoldierWaypoint->GetIndex() == CombatIndex && SoldierWaypoint->GetSide() == Allied)
+		{
+			AllyCombatPositions.Add(SoldierWaypoint);
+		}
+	}
+
+	for (ASoldier* AllySoldier : AllySoldiers)
+	{
+		if (AllyCombatPositions.Num() > 0)
+		{
+			AllySoldier->EngageCombat(AllyCombatPositions[0]);
+			AllyCombatPositions.RemoveAt(0);
+		}
+	}
+
+
+	for (AEnemySpawner* Spawner : EnemySpawners)
+	{
+		if (Spawner->GetFightIndex() == CombatIndex)
+		{
+			EnemySoldiers.Add(Spawner->SpawnEnemy());
+		}
+	}
 }

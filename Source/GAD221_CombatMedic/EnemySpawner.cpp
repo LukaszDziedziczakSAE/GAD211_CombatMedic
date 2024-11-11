@@ -2,6 +2,9 @@
 
 
 #include "EnemySpawner.h"
+#include "Soldier.h"
+#include "SoldierAIController.h"
+#include "SoldierWaypoint.h"
 
 // Sets default values
 AEnemySpawner::AEnemySpawner()
@@ -25,10 +28,11 @@ void AEnemySpawner::Tick(float DeltaTime)
 
 }
 
-void AEnemySpawner::SpawnEnemy()
+ASoldier* AEnemySpawner::SpawnEnemy()
 {
+	ASoldier* NewSoldier = GetWorld()->SpawnActor<ASoldier>(EnemyPrefab, GetActorLocation(), GetActorRotation());
+	NewSoldier->EngageCombat(GoToWaypoint);
 
-	// spawn enemy
-	// set fighting position waypoint
+	return NewSoldier;
 }
 

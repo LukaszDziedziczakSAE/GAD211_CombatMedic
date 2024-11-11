@@ -27,6 +27,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<class ASoldierWaypoint*> CombatPositions;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int LastTravelWaypointIndex;
+
 public:
 	UFUNCTION(BlueprintCallable)
 	void SetWaypoint(FVector Location);
@@ -39,4 +42,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetIsInCombat(bool InCombat);
+
+	UFUNCTION(BlueprintCallable)
+	void ArrivedAtWaypoint(int WaypointIndex);
+
+	UFUNCTION(BlueprintCallable)
+	void GoToLastWaypointSet();
 };

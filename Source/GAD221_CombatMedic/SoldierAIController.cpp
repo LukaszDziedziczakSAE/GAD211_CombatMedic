@@ -4,6 +4,7 @@
 #include "SoldierAIController.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "Soldier.h"
+#include "SoldierCombat.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "CombatMedicGameMode.h"
 #include "SoldierWaypoint.h"
@@ -11,38 +12,56 @@
 
 void ASoldierAIController::OnPossess(APawn* InPawn)
 {
+	Super::OnPossess(InPawn);
+
 	Soldier = Cast<ASoldier>(InPawn);
+
+	if (Soldier == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Missing Soldier reference"));
+		return;
+	}
 
 	RunBehaviorTree(BehaviorTree);
 
-	TArray<AActor*> WaypointActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASoldierWaypoint::StaticClass(), WaypointActors);
-
-	for (AActor* WaypointActor : WaypointActors)
+	if (Soldier->SoldierSide == Allied)
 	{
-		ASoldierWaypoint* Waypoint = Cast<ASoldierWaypoint>(WaypointActor);
-		if (Waypoint == nullptr) continue;
+		TArray<AActor*> WaypointActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASoldierWaypoint::StaticClass(), WaypointActors);
 
-		if (Waypoint->GetWaypointType() == Travel)
+		for (AActor* WaypointActor : WaypointActors)
 		{
-			TravelWaypoints.Add(Waypoint);
-			/*if (Waypoint->GetIndex() == 0)
+			ASoldierWaypoint* Waypoint = Cast<ASoldierWaypoint>(WaypointActor);
+			if (Waypoint == nullptr) continue;
+
+			if (Waypoint->GetWaypointType() == Travel)
 			{
-				SetWaypoint(Waypoint->GetActorLocation());
-			}*/
-		}
+				TravelWaypoints.Add(Waypoint);
+				if (Waypoint->GetIndex() == 0)
+				{
+					SetWaypoint(Waypoint->GetActorLocation());
+				}
+			}
 
-		else if (Waypoint->GetWaypointType() == FightingPosition)
-		{
-			CombatPositions.Add(Waypoint);
+			else if (Waypoint->GetWaypointType() == FightingPosition)
+			{
+				CombatPositions.Add(Waypoint);
+			}
 		}
 	}
 
-	if (Soldier->FirstWaypoint != nullptr)
+	/*else if (Soldier->SoldierSide == Enemy)
 	{
-		SetWaypoint(Soldier->FirstWaypoint->GetActorLocation());
+		SetIsInCombat(true);
 
-	}
+		if (Soldier->Combat->GetFightingPosition() == nullptr)
+		{
+			UE_LOG(LogTemp, Error, TEXT("AI cannot find fighting position"));
+			return;
+		}
+
+		SetWaypoint(Soldier->Combat->GetFightingPosition()->GetActorLocation());
+	}*/
 }
 
 void ASoldierAIController::SetWaypoint(FVector Location)
@@ -63,4 +82,23 @@ void ASoldierAIController::SetIsDowned(bool IsDowned)
 void ASoldierAIController::SetIsInCombat(bool InCombat)
 {
 	GetBlackboardComponent()->SetValueAsBool(TEXT("InCombat"), InCombat);
+}
+
+void ASoldierAIController::ArrivedAtWaypoint(int WaypointIndex)
+{
+	LastTravelWaypointIndex = WaypointIndex + 1;
+	GoToLastWaypointSet();
+}
+
+void ASoldierAIController::GoToLastWaypointSet()
+{
+	if (TravelWaypoints.Num() == 0) return;
+
+	for (ASoldierWaypoint* Waypoint : TravelWaypoints)
+	{
+		if (Waypoint->GetIndex() == LastTravelWaypointIndex)
+		{
+			SetWaypoint(Waypoint->GetActorLocation());
+		}
+	}
 }

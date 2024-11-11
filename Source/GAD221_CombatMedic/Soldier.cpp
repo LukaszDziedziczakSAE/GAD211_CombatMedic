@@ -183,9 +183,12 @@ void ASoldier::BeginPlay()
 	Super::BeginPlay();
 
 	AI = Cast<ASoldierAIController>(GetController());
+
+	if (SoldierSide == Enemy)
+	{
+		bIsInCombat = true;
+	}
 	AdjustMovementSpeed();
-	//Injury.GenerateNew();
-	//bIsDowned = true;
 }
 
 void ASoldier::OnOverlapBegin(UPrimitiveComponent* newComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -217,8 +220,6 @@ void ASoldier::AdjustMovementSpeed()
 	{
 		GetCharacterMovement()->MaxWalkSpeed = bIsInCombat ? RunningSpeed : WalkingSpeed;
 	}
-
-	
 }
 
 // Called every frame
@@ -290,10 +291,12 @@ void ASoldier::SetCrouching(float Value)
 	AdjustMovementSpeed();
 }
 
-void ASoldier::EngageCombat()
+void ASoldier::EngageCombat(ASoldierWaypoint* FightingPosition)
 {
 	bIsInCombat = true;
-	AI->SetIsInCombat(bIsInCombat);
+	if (AI != nullptr) AI->SetIsInCombat(bIsInCombat);
+	else UE_LOG(LogTemp, Error, TEXT("%s missing AI"), *GetName());
+	Combat->SetFightingPosition(FightingPosition);
 	AdjustMovementSpeed();
 }
 
@@ -301,6 +304,8 @@ void ASoldier::DisengageCombat()
 {
 	bIsInCombat = false;
 	AI->SetIsInCombat(bIsInCombat);
+	Combat->ClearWaypoint();
+	AI->GoToLastWaypointSet();
 	AdjustMovementSpeed();
 }
 

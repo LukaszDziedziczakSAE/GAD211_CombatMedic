@@ -3,6 +3,8 @@
 
 #include "SoldierCombat.h"
 #include "Soldier.h"
+#include "SoldierAIController.h"
+#include "SoldierWaypoint.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values for this component's properties
@@ -34,6 +36,17 @@ void USoldierCombat::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	// ...
 }
 
+void USoldierCombat::SetFightingPosition(ASoldierWaypoint* Waypoint)
+{
+	FightingPosition = Waypoint;
+	if (Soldier->SoldierAI() != nullptr) Soldier->SoldierAI()->SetWaypoint(FightingPosition->GetActorLocation());
+}
+
+void USoldierCombat::ClearWaypoint()
+{
+	FightingPosition = nullptr;
+}
+
 void USoldierCombat::Fire()
 {
 	if (Opponent == nullptr) return;
@@ -58,5 +71,41 @@ bool USoldierCombat::OpponentIsDown()
 	return Opponent->IsDowned();
 
 
+}
+
+void USoldierCombat::SetOpponentSoldier(ASoldier* OpponentSoldier)
+{
+	if (Opponent == OpponentSoldier) return;
+
+	Opponent = OpponentSoldier;
+	UE_LOG(LogTemp, Warning, TEXT("%s set opponent to %s"), *Soldier->GetName(), *OpponentSoldier->GetName());
+
+	if (Soldier->SoldierAI() != nullptr)
+	{
+		Soldier->SoldierAI()->SetOpponent(Opponent);
+	}
+}
+
+void USoldierCombat::LookAtOpponent()
+{
+	if (Opponent == nullptr) return;
+
+	FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(Soldier->GetActorLocation(), Opponent->GetActorLocation());
+
+	Soldier->SetActorRotation(LookAtRot);
+}
+
+void USoldierCombat::TrySetOpponent()
+{
+	if (Opponent != nullptr || FightingPosition == nullptr) return;
+
+	for (ASoldierWaypoint* CombatWaypoint : FightingPosition->TargetFightingPositions)
+	{
+		if (CombatWaypoint->SoldierInOverlap != nullptr)
+		{
+			SetOpponentSoldier(CombatWaypoint->SoldierInOverlap);
+			return;
+		}
+	}
 }
 

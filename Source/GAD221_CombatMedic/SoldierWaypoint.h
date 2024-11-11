@@ -40,7 +40,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TEnumAsByte<EWaypointType> WaypointType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USphereComponent* Proximity;
 
 	UFUNCTION()
@@ -48,7 +48,6 @@ protected:
 
 	UFUNCTION()
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
 
 public:	
 	// Called every frame
@@ -62,4 +61,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	TEnumAsByte<EWaypointType> GetWaypointType() { return WaypointType; }
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class ASoldier* SoldierInOverlap;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<ASoldierWaypoint*> TargetFightingPositions;
 };
