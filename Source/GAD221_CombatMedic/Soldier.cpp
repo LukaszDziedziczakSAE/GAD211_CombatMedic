@@ -11,7 +11,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "SoldierCombat.h"
-
+#include "SoldierAIController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 ASoldier::ASoldier()
@@ -181,8 +182,13 @@ void ASoldier::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//Injury.GenerateNew();
-	//bIsDowned = true;
+	AI = Cast<ASoldierAIController>(GetController());
+
+	if (SoldierSide == Enemy)
+	{
+		bIsInCombat = true;
+	}
+	AdjustMovementSpeed();
 }
 
 void ASoldier::OnOverlapBegin(UPrimitiveComponent* newComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -202,6 +208,18 @@ void ASoldier::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 	if (Player == nullptr) return;
 
 	if (Player->MedicInteraction->Patient == this) Player->MedicInteraction->Patient = nullptr;
+}
+
+void ASoldier::AdjustMovementSpeed()
+{
+	if (Crouching > 0)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = CrouchingWalkSpeed;
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = bIsInCombat ? RunningSpeed : WalkingSpeed;
+	}
 }
 
 // Called every frame
@@ -228,6 +246,7 @@ void ASoldier::SetInjury(FInjury NewInjury)
 	bHasBeenInjured = true;*/
 	Injury = NewInjury;
 	bIsDowned = true;
+	AI->SetIsDowned(bIsDowned);
 }
 
 void ASoldier::SetRandomInjury()
@@ -262,10 +281,36 @@ void ASoldier::HealInjury(float Amount)
 	{
 		Injury.BodyPart = None;
 		bIsDowned = false;
+		AI->SetIsDowned(bIsDowned);
 	}
+}
+
+void ASoldier::SetCrouching(float Value)
+{
+	Crouching = Value;
+	AdjustMovementSpeed();
+}
+
+void ASoldier::EngageCombat(ASoldierWaypoint* FightingPosition)
+{
+	bIsInCombat = true;
+	if (AI != nullptr) AI->SetIsInCombat(bIsInCombat);
+	else UE_LOG(LogTemp, Error, TEXT("%s missing AI"), *GetName());
+	Combat->SetFightingPosition(FightingPosition);
+	AdjustMovementSpeed();
+}
+
+void ASoldier::DisengageCombat()
+{
+	bIsInCombat = false;
+	AI->SetIsInCombat(bIsInCombat);
+	Combat->ClearWaypoint();
+	AI->GoToLastWaypointSet();
+	AdjustMovementSpeed();
 }
 
 void ASoldier::FireWeapon_Implementation()
 {
+
 }
 

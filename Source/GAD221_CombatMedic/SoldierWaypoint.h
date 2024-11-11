@@ -7,6 +7,14 @@
 #include "Soldier.h"
 #include "SoldierWaypoint.generated.h"
 
+UENUM(BlueprintType)
+enum EWaypointType
+{
+	Travel,
+	FightingPosition
+};
+
+
 UCLASS()
 class GAD221_COMBATMEDIC_API ASoldierWaypoint : public AActor
 {
@@ -21,7 +29,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int WaveIndex;
+	int Index;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TEnumAsByte<ESoldierSide> Side;
@@ -29,13 +37,34 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float CrouchingAmmount;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TEnumAsByte<EWaypointType> WaypointType;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class USphereComponent* Proximity;
+
+	UFUNCTION()
+	virtual void OnOverlapBegin(class UPrimitiveComponent* newComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable)
-	int GetWaveIndex() { return WaveIndex; }
+	int GetIndex() { return Index; }
 
 	UFUNCTION(BlueprintCallable)
 	TEnumAsByte<ESoldierSide> GetSide() { return Side; }
+
+	UFUNCTION(BlueprintCallable)
+	TEnumAsByte<EWaypointType> GetWaypointType() { return WaypointType; }
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class ASoldier* SoldierInOverlap;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<ASoldierWaypoint*> TargetFightingPositions;
 };
