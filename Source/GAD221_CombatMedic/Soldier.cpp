@@ -11,7 +11,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "SoldierCombat.h"
-
+#include "SoldierAIController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 ASoldier::ASoldier()
@@ -181,6 +182,8 @@ void ASoldier::BeginPlay()
 {
 	Super::BeginPlay();
 
+	AI = Cast<ASoldierAIController>(GetController());
+	AdjustMovementSpeed();
 	//Injury.GenerateNew();
 	//bIsDowned = true;
 }
@@ -202,6 +205,20 @@ void ASoldier::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 	if (Player == nullptr) return;
 
 	if (Player->MedicInteraction->Patient == this) Player->MedicInteraction->Patient = nullptr;
+}
+
+void ASoldier::AdjustMovementSpeed()
+{
+	if (Crouching > 0)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = CrouchingWalkSpeed;
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = bIsInCombat ? RunningSpeed : WalkingSpeed;
+	}
+
+	
 }
 
 // Called every frame
@@ -228,6 +245,7 @@ void ASoldier::SetInjury(FInjury NewInjury)
 	bHasBeenInjured = true;*/
 	Injury = NewInjury;
 	bIsDowned = true;
+	AI->SetIsDowned(bIsDowned);
 }
 
 void ASoldier::SetRandomInjury()
@@ -262,10 +280,32 @@ void ASoldier::HealInjury(float Amount)
 	{
 		Injury.BodyPart = None;
 		bIsDowned = false;
+		AI->SetIsDowned(bIsDowned);
 	}
+}
+
+void ASoldier::SetCrouching(float Value)
+{
+	Crouching = Value;
+	AdjustMovementSpeed();
+}
+
+void ASoldier::EngageCombat()
+{
+	bIsInCombat = true;
+	AI->SetIsInCombat(bIsInCombat);
+	AdjustMovementSpeed();
+}
+
+void ASoldier::DisengageCombat()
+{
+	bIsInCombat = false;
+	AI->SetIsInCombat(bIsInCombat);
+	AdjustMovementSpeed();
 }
 
 void ASoldier::FireWeapon_Implementation()
 {
+
 }
 

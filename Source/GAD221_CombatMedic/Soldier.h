@@ -27,8 +27,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bIsDowned;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bIsInCombat;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USphereComponent* InteractionProximity;
@@ -132,6 +135,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USkeletalMeshComponent* Weapon;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Crouching;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class ASoldierAIController* AI;
+
+	UFUNCTION()
+	void AdjustMovementSpeed();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -180,4 +192,19 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void FireWeapon();
+
+	UFUNCTION(BlueprintCallable)
+	void SetCrouching(float Value);
+
+	UFUNCTION(BlueprintCallable)
+	void EngageCombat();
+
+	UFUNCTION(BlueprintCallable)
+	void DisengageCombat();
+
+	UFUNCTION(BlueprintCallable)
+	ASoldierAIController* SoldierAI() { return AI; }
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	class ASoldierWaypoint* FirstWaypoint;
 };
