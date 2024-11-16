@@ -124,5 +124,7 @@ void USoldierCombat::TrySetOpponent()
 			return;
 		}
 	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Did not find opponent"));
 }
 
