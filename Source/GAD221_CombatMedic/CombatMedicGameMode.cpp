@@ -100,7 +100,7 @@ void ACombatMedicGameMode::TryEndCombat()
 	{
 		for (ASoldier* Soldier : AllySoldiers)
 		{
-			Soldier->Combat->EndCombat();
+			Soldier->DisengageCombat();
 		}
 	}
 }

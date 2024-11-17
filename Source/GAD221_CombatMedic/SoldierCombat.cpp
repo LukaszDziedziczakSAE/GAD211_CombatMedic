@@ -140,7 +140,5 @@ void USoldierCombat::EndCombat()
 {
 	Opponent = nullptr;
 	FightingPosition = nullptr;
-	Soldier->SoldierAI()->SetOpponent(Opponent);
-	Soldier->SoldierAI()->GoToLastWaypointSet();
 }
 

@@ -304,7 +304,7 @@ void ASoldier::DisengageCombat()
 {
 	bIsInCombat = false;
 	AI->SetIsInCombat(bIsInCombat);
-	Combat->ClearWaypoint();
+	Combat->EndCombat();
 	AI->GoToLastWaypointSet();
 	AdjustMovementSpeed();
 }
