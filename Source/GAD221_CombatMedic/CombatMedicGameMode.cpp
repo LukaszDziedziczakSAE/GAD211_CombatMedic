@@ -4,6 +4,7 @@
 #include "CombatMedicGameMode.h"
 #include "Soldier.h"
 #include "SoldierWaypoint.h"
+#include "SoldierCombat.h"
 #include "Kismet/GameplayStatics.h"
 #include "SoldierAIController.h"
 #include "EnemySpawner.h"
@@ -91,4 +92,27 @@ void ACombatMedicGameMode::BeginCombat(int Index)
 			EnemySoldiers.Add(Spawner->SpawnEnemy());
 		}
 	}
+}
+
+void ACombatMedicGameMode::TryEndCombat()
+{
+	if (AllEnemySoldiersDown())
+	{
+		for (ASoldier* Soldier : AllySoldiers)
+		{
+			Soldier->Combat->EndCombat();
+		}
+	}
+}
+
+bool ACombatMedicGameMode::AllEnemySoldiersDown()
+{
+	for (ASoldier* Combatant : EnemySoldiers)
+	{
+		if (!Combatant->IsDowned())
+		{
+			return false;
+		}
+	}
+	return true;
 }

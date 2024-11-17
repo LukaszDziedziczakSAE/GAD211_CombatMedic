@@ -6,6 +6,7 @@
 #include "SoldierAIController.h"
 #include "SoldierWaypoint.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "CombatMedicGameMode.h"
 
 // Sets default values for this component's properties
 USoldierCombat::USoldierCombat()
@@ -74,6 +75,11 @@ void USoldierCombat::Fire()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("%s hit %s"), *Soldier->GetName(), *Opponent->GetName());
 		Opponent->SetRandomInjury();
+
+		if (Soldier->SoldierSide == Allied)
+		{
+			Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->TryEndCombat();
+		}
 	}
 	else
 	{
@@ -112,19 +118,29 @@ void USoldierCombat::LookAtOpponent()
 	Soldier->SetActorRotation(LookAtRot, ETeleportType::TeleportPhysics);
 }
 
-void USoldierCombat::TrySetOpponent()
+bool USoldierCombat::TrySetOpponent()
 {
-	if (Opponent != nullptr || FightingPosition == nullptr) return;
+	if (Opponent != nullptr) return true;
+	if (FightingPosition == nullptr) return false;
 
 	for (ASoldierWaypoint* CombatWaypoint : FightingPosition->TargetFightingPositions)
 	{
-		if (CombatWaypoint->SoldierInOverlap != nullptr)
+		if (CombatWaypoint->SoldierInOverlap != nullptr && !CombatWaypoint->SoldierInOverlap->IsDowned())
 		{
 			SetOpponentSoldier(CombatWaypoint->SoldierInOverlap);
-			return;
+			return true;
 		}
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Did not find opponent"));
+	return false;
+}
+
+void USoldierCombat::EndCombat()
+{
+	Opponent = nullptr;
+	FightingPosition = nullptr;
+	Soldier->SoldierAI()->SetOpponent(Opponent);
+	Soldier->SoldierAI()->GoToLastWaypointSet();
 }
 

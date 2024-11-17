@@ -32,3 +32,79 @@ void UMedicInventory::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	// ...
 }
 
+bool UMedicInventory::HasEnoughItem(EMedicalItemType ItemType)
+{
+	switch (ItemType)
+	{
+	case EMedicalItemType::Bandage:
+		return Bandages > 0;
+
+	case EMedicalItemType::Tourniquet:
+		return Tourniquet > 0;
+
+	case EMedicalItemType::Gauze:
+		return Gauze > 0;
+
+	case EMedicalItemType::ChestSeal:
+		return ChestSeal > 0;
+
+	case EMedicalItemType::PainKiller:
+		return PainKiller > 0;
+
+	default:
+		return true;
+	}
+}
+
+void UMedicInventory::UseItemType(EMedicalItemType ItemType)
+{
+	switch (ItemType)
+	{
+	case EMedicalItemType::Bandage:
+		Bandages--;
+		break;
+
+	case EMedicalItemType::Tourniquet:
+		Tourniquet--;
+		break;
+
+	case EMedicalItemType::Gauze:
+		Gauze--;
+		break;
+
+	case EMedicalItemType::ChestSeal:
+		ChestSeal--;
+		break;
+
+	case EMedicalItemType::PainKiller:
+		PainKiller--;
+		break;
+	}
+}
+
+void UMedicInventory::AddItemType(EMedicalItemType ItemType, int Amount)
+{
+	switch (ItemType)
+	{
+	case EMedicalItemType::Bandage:
+		Bandages += Amount;
+		break;
+
+	case EMedicalItemType::Tourniquet:
+		Tourniquet += Amount;
+		break;
+
+	case EMedicalItemType::Gauze:
+		Gauze += Amount;
+		break;
+
+	case EMedicalItemType::ChestSeal:
+		ChestSeal += Amount;
+		break;
+
+	case EMedicalItemType::PainKiller:
+		PainKiller += Amount;
+		break;
+	}
+}
+

@@ -44,5 +44,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool IsProvidingMedicalAid();
+
+	UFUNCTION(BlueprintPure)
+	bool HasPatient();
 };
 

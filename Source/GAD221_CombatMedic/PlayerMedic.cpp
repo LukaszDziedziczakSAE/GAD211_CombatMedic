@@ -62,3 +62,8 @@ bool APlayerMedic::IsProvidingMedicalAid()
 	return MedicInteraction->GivingMedicalAid();
 }
 
+bool APlayerMedic::HasPatient()
+{
+	return MedicInteraction->Patient != nullptr;
+}
+

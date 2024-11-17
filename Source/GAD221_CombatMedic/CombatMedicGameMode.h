@@ -41,4 +41,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void BeginCombat(int CombaIndex);
+
+	UFUNCTION(BlueprintCallable)
+	void TryEndCombat();
+
+	UFUNCTION(BlueprintCallable)
+	bool AllEnemySoldiersDown();
 };

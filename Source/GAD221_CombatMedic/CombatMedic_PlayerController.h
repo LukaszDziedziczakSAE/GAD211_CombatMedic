@@ -29,13 +29,16 @@ protected:
 	class UInputAction* IA_Move;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	class UInputAction* IA_Look;
+	UInputAction* IA_Look;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	class UInputAction* IA_Interact;
+	UInputAction* IA_Interact;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	class UInputAction* IA_LeftMouse;
+	UInputAction* IA_LeftMouse;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UInputAction* IA_CallEvac;
 
 	UFUNCTION()
 	virtual void SetupInputComponent() override;
@@ -54,6 +57,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CameraTransitionTime;
+
+	UFUNCTION()
+	void CallEvac();
 	
 public:
 	UFUNCTION()

@@ -7,6 +7,7 @@
 #include "CombatMedic_PlayerController.h"
 #include "Soldier.h"
 #include "Components/ShapeComponent.h"
+#include "MedicInventory.h"
 
 // Sets default values for this component's properties
 UMedicInteraction::UMedicInteraction()
@@ -75,13 +76,15 @@ bool UMedicInteraction::GivingMedicalAid()
 void UMedicInteraction::StartMedicalItemApplication(TEnumAsByte<EMedicalItemType> ItemType)
 {
 	if (BodyPartSelected != None) return;
+	if (!Player->MedicInventory->HasEnoughItem(ItemType)) return;
+
 
 	InteractionType = ItemType;
 }
 
 void UMedicInteraction::EndMedicalItemApplication(UShapeComponent* HitShape)
 {
-	if (BodyPartSelected != None) return;
+	if (BodyPartSelected != None || InteractionType == NoType) return;
 
 	if (HitShape != nullptr)
 	{
@@ -115,6 +118,8 @@ void UMedicInteraction::CompleteMedicalItemApplication()
 		Interact();
 		Patient = nullptr;
 	}
+
+	Player->MedicInventory->UseItemType(InteractionType);
 
 	BodyPartSelected = None;
 	InteractionType = NoType;

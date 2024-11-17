@@ -58,5 +58,8 @@ public:
 	void LookAtOpponent();
 
 	UFUNCTION(BlueprintCallable)
-	void TrySetOpponent();
+	bool TrySetOpponent();
+
+	UFUNCTION(BlueprintCallable)
+	void EndCombat();
 };
