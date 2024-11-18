@@ -67,7 +67,7 @@ void USoldierCombat::ClearWaypoint()
 
 void USoldierCombat::Fire()
 {
-	if (Opponent == nullptr) return;
+	if (Opponent == nullptr || FightingPosition->SoldierInOverlap != Soldier) return;
 
 	float Random = UKismetMathLibrary::RandomFloatInRange(0, 1);
 

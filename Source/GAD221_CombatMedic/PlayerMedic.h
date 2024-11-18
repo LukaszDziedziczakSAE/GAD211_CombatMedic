@@ -19,6 +19,26 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY()
+	float Stamina;
+
+	UPROPERTY(EditDefaultsOnly)
+	float StaminaMax{ 100.0f };
+
+	UPROPERTY(EditDefaultsOnly)
+	float SprintSpeed{ 600.0f };
+
+	UPROPERTY(EditDefaultsOnly)
+	float WalkSpeed{ 150.0f };
+
+	UPROPERTY(EditDefaultsOnly)
+	float StaminaRecharge{ 10.0f };
+
+	UPROPERTY(EditDefaultsOnly)
+	float StaminSprintUse{ 20.0f };
+
+	UPROPERTY()
+	bool bSprinting;
 
 public:	
 	// Called every frame
@@ -47,5 +67,14 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	bool HasPatient();
+
+	UFUNCTION(BlueprintPure)
+	float StaminaPercentage() { return Stamina / StaminaMax; }
+
+	UFUNCTION(BlueprintCallable)
+	void StartSprinting();
+
+	UFUNCTION(BlueprintCallable)
+	void StopSprinting();
 };
 

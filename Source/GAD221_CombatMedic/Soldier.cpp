@@ -15,6 +15,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
+#include "CombatMedicGameMode.h"
 
 // Sets default values
 ASoldier::ASoldier()
@@ -221,6 +222,10 @@ ASoldier::ASoldier()
 	LeftLegBleed = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Left Leg Bleed"));
 	LeftLegBleed->SetupAttachment(GetMesh(), TEXT("calf_l"));
 	LeftLegBleed->bAutoActivate = false;
+
+	DeathBleed = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Death Bleed"));
+	DeathBleed->SetupAttachment(GetMesh(), TEXT("spine_02"));
+	DeathBleed->bAutoActivate = false;
 }
 
 // Called when the game starts or when spawned
@@ -292,7 +297,7 @@ void ASoldier::SetInjury(FInjury NewInjury)
 	bHasBeenInjured = true;*/
 	Injury = NewInjury;
 	bIsDowned = true;
-	AI->SetIsDowned(bIsDowned);
+	if (AI != nullptr) AI->SetIsDowned(bIsDowned);
 	StartBleeding(Injury.BodyPart);
 }
 
@@ -330,6 +335,7 @@ void ASoldier::HealInjury(float Amount)
 		bIsDowned = false;
 		AI->SetIsDowned(bIsDowned);
 		StopAllBleeding();
+		Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->TryEndCombat();
 	}
 }
 
@@ -421,6 +427,25 @@ void ASoldier::StartBleeding(TEnumAsByte<EBodyPart> BodyPart)
 		break;
 
 	}
+}
+
+void ASoldier::Death()
+{
+	if (!bIsAlive) return;
+	bIsAlive = false;
+
+	StopAllBleeding();
+
+	TArray<USkeletalMeshComponent*> ChildrenComponents;
+	GetComponents<USkeletalMeshComponent>(ChildrenComponents);
+
+	GetMesh()->Stop();
+
+	FVector DeathLocation = GetMesh()->GetRelativeLocation();
+	DeathLocation.Z -= 5;
+	GetMesh()->SetRelativeLocation(DeathLocation);
+
+	DeathBleed->Activate();
 }
 
 void ASoldier::FireWeapon_Implementation()

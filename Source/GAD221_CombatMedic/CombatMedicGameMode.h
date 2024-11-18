@@ -47,4 +47,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool AllEnemySoldiersDown();
+
+	UFUNCTION(BlueprintCallable)
+	bool AllAlliesStanding();
 };

@@ -96,11 +96,16 @@ void ACombatMedicGameMode::BeginCombat(int Index)
 
 void ACombatMedicGameMode::TryEndCombat()
 {
-	if (AllEnemySoldiersDown())
+	if (AllEnemySoldiersDown() && AllAlliesStanding())
 	{
 		for (ASoldier* Soldier : AllySoldiers)
 		{
 			Soldier->DisengageCombat();
+		}
+
+		for (ASoldier* Enemy : EnemySoldiers)
+		{
+			Enemy->Death();
 		}
 	}
 }
@@ -110,6 +115,18 @@ bool ACombatMedicGameMode::AllEnemySoldiersDown()
 	for (ASoldier* Combatant : EnemySoldiers)
 	{
 		if (!Combatant->IsDowned())
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+bool ACombatMedicGameMode::AllAlliesStanding()
+{
+	for (ASoldier* Soldier : AllySoldiers)
+	{
+		if (Soldier->IsDowned())
 		{
 			return false;
 		}

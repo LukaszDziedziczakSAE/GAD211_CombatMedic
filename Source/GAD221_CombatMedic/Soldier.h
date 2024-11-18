@@ -33,6 +33,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bIsInCombat;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bIsAlive{ true };
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USphereComponent* InteractionProximity;
 
@@ -177,6 +180,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UNiagaraComponent* LeftLegBleed;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* DeathBleed;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -246,4 +252,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void StartBleeding(TEnumAsByte<EBodyPart> BodyPart);
+
+	UFUNCTION(BlueprintCallable)
+	void Death();
 };

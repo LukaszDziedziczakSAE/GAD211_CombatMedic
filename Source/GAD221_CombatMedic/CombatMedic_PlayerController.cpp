@@ -52,6 +52,8 @@ void ACombatMedic_PlayerController::SetupInputComponent()
 		Input->BindAction(IA_Interact, ETriggerEvent::Started, this, &ACombatMedic_PlayerController::Interact);
 		Input->BindAction(IA_LeftMouse, ETriggerEvent::Completed, this, &ACombatMedic_PlayerController::LeftMouseUp);
 		Input->BindAction(IA_CallEvac, ETriggerEvent::Started, this, &ACombatMedic_PlayerController::CallEvac);
+		Input->BindAction(IA_Sprint, ETriggerEvent::Started, this, &ACombatMedic_PlayerController::SprintStart);
+		Input->BindAction(IA_Sprint, ETriggerEvent::Completed, this, &ACombatMedic_PlayerController::SprintStop);
 	}
 
 	else
@@ -100,6 +102,18 @@ void ACombatMedic_PlayerController::CallEvac()
 {
 	if (PlayerMedic == nullptr) return;
 	UE_LOG(LogTemp, Warning, TEXT("Call Evac key pressed"));
+}
+
+void ACombatMedic_PlayerController::SprintStart()
+{
+	if (PlayerMedic == nullptr) return;
+	PlayerMedic->StartSprinting();
+}
+
+void ACombatMedic_PlayerController::SprintStop()
+{
+	if (PlayerMedic == nullptr) return;
+	PlayerMedic->StopSprinting();
 }
 
 void ACombatMedic_PlayerController::SwitchToPatientCamera()

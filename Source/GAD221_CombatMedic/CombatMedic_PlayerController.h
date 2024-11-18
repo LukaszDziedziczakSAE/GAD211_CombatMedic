@@ -40,6 +40,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UInputAction* IA_CallEvac;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UInputAction* IA_Sprint;
+
 	UFUNCTION()
 	virtual void SetupInputComponent() override;
 
@@ -60,6 +63,12 @@ protected:
 
 	UFUNCTION()
 	void CallEvac();
+
+	UFUNCTION()
+	void SprintStart();
+
+	UFUNCTION()
+	void SprintStop();
 	
 public:
 	UFUNCTION()

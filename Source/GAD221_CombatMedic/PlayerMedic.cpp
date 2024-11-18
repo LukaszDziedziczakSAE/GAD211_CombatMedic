@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "CombatMedic_PlayerController.h"
 #include "MedicInventory.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 APlayerMedic::APlayerMedic()
@@ -27,12 +28,27 @@ void APlayerMedic::BeginPlay()
 	Super::BeginPlay();
 	
 	PlayerController = Cast<ACombatMedic_PlayerController>(GetController());
+	Stamina = StaminaMax;
+	StopSprinting();
 }
 
 // Called every frame
 void APlayerMedic::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (bSprinting && GetCharacterMovement()->Velocity.Length() > 0)
+	{
+		Stamina = FMath::Clamp(Stamina - (StaminSprintUse * DeltaTime), 0, StaminaMax);
+		if (Stamina <= 0)
+		{
+			StopSprinting();
+		}
+	}
+	else if (!bSprinting && Stamina < StaminaMax)
+	{
+		Stamina = FMath::Clamp(Stamina + (StaminaRecharge * DeltaTime), 0, StaminaMax);
+	}
 
 }
 
@@ -70,5 +86,17 @@ bool APlayerMedic::IsProvidingMedicalAid()
 bool APlayerMedic::HasPatient()
 {
 	return MedicInteraction->Patient != nullptr;
+}
+
+void APlayerMedic::StartSprinting()
+{
+	bSprinting = true;
+	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+}
+
+void APlayerMedic::StopSprinting()
+{
+	bSprinting = false;
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
