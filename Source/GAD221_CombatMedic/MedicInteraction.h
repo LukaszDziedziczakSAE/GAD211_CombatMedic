@@ -39,8 +39,8 @@ protected:
 	UPROPERTY()
 	float ApplicationCurrent;
 
-	UPROPERTY()
-	float ApplicationMax{ 1.0f };
+	UPROPERTY(EditAnywhere)
+	float MedApplicationTime{ 1.0f };
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TEnumAsByte<EBodyPart> BodyPartSelected;
@@ -83,7 +83,7 @@ public:
 	float AmountByAffect(TEnumAsByte<EMedicalItemType> ItemType, TEnumAsByte<EBodyPart> BodyPart);
 
 	UFUNCTION(BlueprintPure)
-	float GetApplicationProgress() { return ApplicationCurrent / ApplicationMax; }
+	float GetApplicationProgress() { return ApplicationCurrent / MedApplicationTime; }
 
 	UFUNCTION(BlueprintPure)
 	bool HasItemToPickup() { return ItemPickup != nullptr; }

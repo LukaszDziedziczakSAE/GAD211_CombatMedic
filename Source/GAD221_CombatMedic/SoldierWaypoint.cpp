@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "Soldier.h"
 #include "SoldierAIController.h"
+#include "SoldierCombat.h"
 
 
 // Sets default values
@@ -36,14 +37,16 @@ void ASoldierWaypoint::OnOverlapBegin(UPrimitiveComponent* newComp, AActor* Othe
 
 	
 
-	SoldierInOverlap = Soldier;
+	
 
 	if (WaypointType == Travel)
 	{
 		Soldier->SoldierAI()->ArrivedAtWaypoint(Index);
+		SoldierInOverlap = Soldier;
 	}
-	else if (WaypointType == FightingPosition)
+	else if (WaypointType == FightingPosition && Soldier->Combat->GetFightingPosition() == this)
 	{
+		SoldierInOverlap = Soldier;
 		Soldier->SetCrouching(CrouchingAmmount);
 		UE_LOG(LogTemp, Warning, TEXT("%s entered %s"), *Soldier->GetName(), *GetName());
 	}
@@ -52,7 +55,7 @@ void ASoldierWaypoint::OnOverlapBegin(UPrimitiveComponent* newComp, AActor* Othe
 void ASoldierWaypoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	ASoldier* Soldier = Cast<ASoldier>(OtherActor);
-	if (Soldier == nullptr || Soldier->IsInCombat() || SoldierInOverlap == nullptr) return;
+	if (Soldier == nullptr || /*Soldier->IsInCombat() ||*/ SoldierInOverlap == nullptr) return;
 	
 	if (SoldierInOverlap == Soldier) SoldierInOverlap = nullptr;
 

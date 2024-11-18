@@ -29,7 +29,7 @@ void UMedicInteraction::BeginPlay()
 	HUD = Cast<ACombatMedic_HUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 	Player = Cast<APlayerMedic>(GetOwner());
 
-	ApplicationCurrent = ApplicationMax;
+	ApplicationCurrent = MedApplicationTime;
 }
 
 
@@ -38,13 +38,13 @@ void UMedicInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (ApplicationCurrent < ApplicationMax)
+	if (ApplicationCurrent < MedApplicationTime)
 	{
 		ApplicationCurrent += DeltaTime;
 
-		if (ApplicationCurrent >= ApplicationMax)
+		if (ApplicationCurrent >= MedApplicationTime)
 		{
-			ApplicationCurrent = ApplicationMax;
+			ApplicationCurrent = MedApplicationTime;
 			CompleteMedicalItemApplication();
 		}
 	}

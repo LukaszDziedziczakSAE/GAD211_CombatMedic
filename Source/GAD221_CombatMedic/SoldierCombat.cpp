@@ -80,6 +80,8 @@ void USoldierCombat::Fire()
 		{
 			Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->TryEndCombat();
 		}
+
+		Opponent = nullptr;
 	}
 	else
 	{
@@ -125,16 +127,31 @@ void USoldierCombat::LookAtOpponent()
 
 bool USoldierCombat::TrySetOpponent()
 {
-	if (Opponent != nullptr) return true;
-	if (FightingPosition == nullptr) return false;
-
-	for (ASoldierWaypoint* CombatWaypoint : FightingPosition->TargetFightingPositions)
+	if (Opponent != nullptr)
 	{
-		if (CombatWaypoint->SoldierInOverlap != nullptr && !CombatWaypoint->SoldierInOverlap->IsDowned())
+		UE_LOG(LogTemp, Warning, TEXT("%s already has opponent"), *Soldier->GetName());
+		return true;
+	}
+	if (FightingPosition == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s FightingPosition missing"), *Soldier->GetName());
+		return false;
+	}
+
+	int MaxLoop = 1000;
+	int Loop = 0;
+
+	while (Loop < MaxLoop)
+	{
+		for (ASoldierWaypoint* CombatWaypoint : FightingPosition->TargetFightingPositions)
 		{
-			SetOpponentSoldier(CombatWaypoint->SoldierInOverlap);
-			return true;
+			if (CombatWaypoint->SoldierInOverlap != nullptr && !CombatWaypoint->SoldierInOverlap->IsDowned())
+			{
+				SetOpponentSoldier(CombatWaypoint->SoldierInOverlap);
+				return true;
+			}
 		}
+		Loop++;
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Did not find opponent"));
