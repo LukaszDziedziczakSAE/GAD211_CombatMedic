@@ -55,6 +55,9 @@ public:
 	void SetOpponentSoldier(ASoldier* OpponentSoldier);
 
 	UFUNCTION(BlueprintCallable)
+	void ClearOpponent();
+
+	UFUNCTION(BlueprintCallable)
 	void LookAtOpponent();
 
 	UFUNCTION(BlueprintCallable)

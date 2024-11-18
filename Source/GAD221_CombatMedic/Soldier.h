@@ -144,6 +144,39 @@ protected:
 	UFUNCTION()
 	void AdjustMovementSpeed();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UNiagaraComponent* TorsoBleed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* NeckBleed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* HeadBleed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* RightShoulderBleed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* RightArmBleed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* LeftShoulderBleed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* LeftArmBleed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* RightHipBleed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* RightLegBleed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* LeftHipBleed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* LeftLegBleed;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -207,4 +240,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	ASoldierAIController* SoldierAI() { return AI; }
+
+	UFUNCTION(BlueprintCallable)
+	void StopAllBleeding();
+
+	UFUNCTION(BlueprintCallable)
+	void StartBleeding(TEnumAsByte<EBodyPart> BodyPart);
 };

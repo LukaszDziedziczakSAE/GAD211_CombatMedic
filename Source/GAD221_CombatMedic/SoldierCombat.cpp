@@ -109,6 +109,11 @@ void USoldierCombat::SetOpponentSoldier(ASoldier* OpponentSoldier)
 	}
 }
 
+void USoldierCombat::ClearOpponent()
+{
+	Opponent = nullptr;
+}
+
 void USoldierCombat::LookAtOpponent()
 {
 	if (Opponent == nullptr) return;

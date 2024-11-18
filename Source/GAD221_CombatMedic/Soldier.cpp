@@ -13,6 +13,8 @@
 #include "SoldierCombat.h"
 #include "SoldierAIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 
 // Sets default values
 ASoldier::ASoldier()
@@ -175,6 +177,50 @@ ASoldier::ASoldier()
 	//Weapon->SetupAttachment(GetMesh());
 
 	Combat = CreateDefaultSubobject<USoldierCombat>(TEXT("Combat"));
+
+	TorsoBleed = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Torso Bleed"));
+	TorsoBleed->SetupAttachment(GetMesh(), TEXT("spine_02"));
+	TorsoBleed->bAutoActivate = false;
+
+	NeckBleed = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Neck Bleed"));
+	NeckBleed->SetupAttachment(GetMesh(), TEXT("neck_01"));
+	NeckBleed->bAutoActivate = false;
+
+	HeadBleed = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Head Bleed"));
+	HeadBleed->SetupAttachment(GetMesh(), TEXT("head"));
+	HeadBleed->bAutoActivate = false;
+
+	RightShoulderBleed = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Right Shoulder Bleed"));
+	RightShoulderBleed->SetupAttachment(GetMesh(), TEXT("upperarm_r"));
+	RightShoulderBleed->bAutoActivate = false;
+
+	RightArmBleed = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Right Arm Bleed"));
+	RightArmBleed->SetupAttachment(GetMesh(), TEXT("lowerarm_r"));
+	RightArmBleed->bAutoActivate = false;
+
+	LeftShoulderBleed = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Left Shoulder Bleed"));
+	LeftShoulderBleed->SetupAttachment(GetMesh(), TEXT("upperarm_l"));
+	LeftShoulderBleed->bAutoActivate = false;
+
+	LeftArmBleed = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Left Arm Bleed"));
+	LeftArmBleed->SetupAttachment(GetMesh(), TEXT("lowerarm_l"));
+	LeftArmBleed->bAutoActivate = false;
+
+	RightHipBleed = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Right Hip Bleed"));
+	RightHipBleed->SetupAttachment(GetMesh(), TEXT("thigh_r"));
+	RightHipBleed->bAutoActivate = false;
+
+	RightLegBleed = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Right Leg Bleed"));
+	RightLegBleed->SetupAttachment(GetMesh(), TEXT("calf_r"));
+	RightLegBleed->bAutoActivate = false;
+
+	LeftHipBleed = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Left Hip Bleed"));
+	LeftHipBleed->SetupAttachment(GetMesh(), TEXT("thigh_l"));
+	LeftHipBleed->bAutoActivate = false;
+
+	LeftLegBleed = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Left Leg Bleed"));
+	LeftLegBleed->SetupAttachment(GetMesh(), TEXT("calf_l"));
+	LeftLegBleed->bAutoActivate = false;
 }
 
 // Called when the game starts or when spawned
@@ -247,6 +293,7 @@ void ASoldier::SetInjury(FInjury NewInjury)
 	Injury = NewInjury;
 	bIsDowned = true;
 	AI->SetIsDowned(bIsDowned);
+	StartBleeding(Injury.BodyPart);
 }
 
 void ASoldier::SetRandomInjury()
@@ -282,6 +329,7 @@ void ASoldier::HealInjury(float Amount)
 		Injury.BodyPart = None;
 		bIsDowned = false;
 		AI->SetIsDowned(bIsDowned);
+		StopAllBleeding();
 	}
 }
 
@@ -307,6 +355,72 @@ void ASoldier::DisengageCombat()
 	Combat->EndCombat();
 	AI->GoToLastWaypointSet();
 	AdjustMovementSpeed();
+}
+
+void ASoldier::StopAllBleeding()
+{
+	TorsoBleed->Deactivate();
+	NeckBleed->Deactivate();
+	HeadBleed->Deactivate();
+	RightShoulderBleed->Deactivate();
+	RightArmBleed->Deactivate();
+	LeftShoulderBleed->Deactivate();
+	LeftArmBleed->Deactivate();
+	RightHipBleed->Deactivate();
+	RightLegBleed->Deactivate();
+	LeftHipBleed->Deactivate();
+	LeftLegBleed->Deactivate();
+}
+
+void ASoldier::StartBleeding(TEnumAsByte<EBodyPart> BodyPart)
+{
+	switch (BodyPart)
+	{
+	case Torso:
+		TorsoBleed->Activate();
+		break;
+
+	case Neck:
+		NeckBleed->Activate();
+		break;
+
+	case Head:
+		HeadBleed->Activate();
+		break;
+
+	case RightShoulder:
+		RightShoulderBleed->Activate();
+		break;
+
+	case RightArm:
+		RightArmBleed->Activate();
+		break;
+
+	case LeftShoulder:
+		LeftShoulderBleed->Activate();
+		break;
+
+	case LeftArm:
+		LeftArmBleed->Activate();
+		break;
+
+	case RightHip:
+		RightHipBleed->Activate();
+		break;
+
+	case RightLeg:
+		RightLegBleed->Activate();
+		break;
+
+	case LeftHip:
+		LeftHipBleed->Activate();
+		break;
+
+	case LeftLeg:
+		LeftLegBleed->Activate();
+		break;
+
+	}
 }
 
 void ASoldier::FireWeapon_Implementation()
