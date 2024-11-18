@@ -8,6 +8,7 @@
 #include "Soldier.h"
 #include "Components/ShapeComponent.h"
 #include "MedicInventory.h"
+#include "ItemPickup.h"
 
 // Sets default values for this component's properties
 UMedicInteraction::UMedicInteraction()
@@ -136,5 +137,20 @@ float UMedicInteraction::AmountByAffect(TEnumAsByte<EMedicalItemType> ItemType, 
 	}
 
 	return 0.0f;
+}
+
+void UMedicInteraction::PickUpItem()
+{
+	if (ItemPickup == nullptr) return;
+
+	for (FInventoryItem InventoryItem : ItemPickup->GetInventoryItems())
+	{
+		Player->MedicInventory->AddItemType(InventoryItem.ItemType, InventoryItem.Amount);
+	}
+
+	ItemsPickedUp.Broadcast(ItemPickup->GetInventoryItems());
+
+	ItemPickup->Destroy();
+	ItemPickup = nullptr;
 }
 

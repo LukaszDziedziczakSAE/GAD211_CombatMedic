@@ -6,9 +6,6 @@
 #include "GameFramework/HUD.h"
 #include "CombatMedic_HUD.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class GAD221_COMBATMEDIC_API ACombatMedic_HUD : public AHUD
 {
@@ -20,5 +17,4 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ShowCombatHUD();
-	
 };
