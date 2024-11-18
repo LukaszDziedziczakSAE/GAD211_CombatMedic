@@ -49,6 +49,11 @@ void APlayerMedic::Interact()
 	{
 		MedicInteraction->Interact();
 	}
+
+	else if (MedicInteraction->HasItemToPickup())
+	{
+		MedicInteraction->PickUpItem();
+	}
 }
 
 bool APlayerMedic::IsProvidingMedicalAid()

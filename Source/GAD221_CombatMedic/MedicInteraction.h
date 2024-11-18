@@ -6,8 +6,10 @@
 #include "Components/ActorComponent.h"
 #include "EMedicalItemType.h"
 #include "FMedicalAffect.h"
+#include "FInventoryItem.h"
 #include "MedicInteraction.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemsPickedUpDelegate, const TArray<FInventoryItem>&, InventoryItems);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class GAD221_COMBATMEDIC_API UMedicInteraction : public UActorComponent
@@ -50,6 +52,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class ASoldier* Patient;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class AItemPickup* ItemPickup;
+
 	UFUNCTION(BlueprintCallable)
 	void Interact();
 
@@ -79,4 +84,13 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	float GetApplicationProgress() { return ApplicationCurrent / ApplicationMax; }
+
+	UFUNCTION(BlueprintPure)
+	bool HasItemToPickup() { return ItemPickup != nullptr; }
+
+	UFUNCTION(BlueprintCallable)
+	void PickUpItem();
+
+	UPROPERTY(BlueprintAssignable)
+	FItemsPickedUpDelegate ItemsPickedUp;
 };
