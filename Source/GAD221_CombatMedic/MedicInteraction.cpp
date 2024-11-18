@@ -143,12 +143,19 @@ void UMedicInteraction::PickUpItem()
 {
 	if (ItemPickup == nullptr) return;
 
-	for (FInventoryItem InventoryItem : ItemPickup->GetInventoryItems())
+	if (ItemPickup->GetInventoryItems().Num() > 0)
 	{
-		Player->MedicInventory->AddItemType(InventoryItem.ItemType, InventoryItem.Amount);
-	}
+		for (FInventoryItem InventoryItem : ItemPickup->GetInventoryItems())
+		{
+			Player->MedicInventory->AddItemType(InventoryItem.ItemType, InventoryItem.Amount);
+		}
 
-	ItemsPickedUp.Broadcast(ItemPickup->GetInventoryItems());
+		ItemsPickedUp.Broadcast(ItemPickup->GetInventoryItems());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s has no medical items"), *ItemPickup->GetName());
+	}
 
 	ItemPickup->Destroy();
 	ItemPickup = nullptr;
