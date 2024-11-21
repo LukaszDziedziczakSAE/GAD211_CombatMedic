@@ -29,12 +29,18 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	ASoldier* Opponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float ChanceToHitBase;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float ChanceToHit{ 0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ChanceToHitIncreasePerShot{ 0.0005 };
 
 	UFUNCTION(BlueprintCallable)
 	void SetFightingPosition(ASoldierWaypoint* Waypoint);
@@ -68,4 +74,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void LookAtFirstFirePosition();
+
+	UFUNCTION(BlueprintCallable)
+	void ResetChanceToHit();
 };

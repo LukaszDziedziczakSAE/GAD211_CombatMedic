@@ -91,7 +91,8 @@ void ACombatMedicGameMode::BeginCombat(int Index)
 	{
 		if (Spawner->GetFightIndex() == CombatIndex)
 		{
-			EnemySoldiers.Add(Spawner->SpawnEnemy());
+			ASoldier* Enemy = Spawner->SpawnEnemy();
+			if (Enemy != nullptr) EnemySoldiers.Add(Enemy);
 		}
 	}
 }

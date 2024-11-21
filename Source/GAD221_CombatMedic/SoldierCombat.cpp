@@ -25,7 +25,7 @@ void USoldierCombat::BeginPlay()
 	Super::BeginPlay();
 
 	Soldier = Cast<ASoldier>(GetOwner());
-	
+	ChanceToHitBase = ChanceToHit;
 }
 
 
@@ -87,6 +87,8 @@ void USoldierCombat::Fire()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("%s missed %s"), *Soldier->GetName(), *Opponent->GetName());
 	}
+
+	ChanceToHit += ChanceToHitIncreasePerShot;
 }
 
 bool USoldierCombat::OpponentIsDown()
@@ -162,6 +164,7 @@ void USoldierCombat::EndCombat()
 {
 	Opponent = nullptr;
 	FightingPosition = nullptr;
+	ResetChanceToHit();
 }
 
 void USoldierCombat::LookAtFirstFirePosition()
@@ -171,5 +174,10 @@ void USoldierCombat::LookAtFirstFirePosition()
 	FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(Soldier->GetActorLocation(), FightingPosition->TargetFightingPositions[0]->GetActorLocation());
 
 	Soldier->SetActorRotation(LookAtRot, ETeleportType::TeleportPhysics);
+}
+
+void USoldierCombat::ResetChanceToHit()
+{
+	ChanceToHit = ChanceToHitBase;
 }
 
