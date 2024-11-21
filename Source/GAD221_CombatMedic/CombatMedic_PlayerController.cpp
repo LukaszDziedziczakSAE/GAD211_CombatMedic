@@ -54,6 +54,7 @@ void ACombatMedic_PlayerController::SetupInputComponent()
 		Input->BindAction(IA_CallEvac, ETriggerEvent::Started, this, &ACombatMedic_PlayerController::CallEvac);
 		Input->BindAction(IA_Sprint, ETriggerEvent::Started, this, &ACombatMedic_PlayerController::SprintStart);
 		Input->BindAction(IA_Sprint, ETriggerEvent::Completed, this, &ACombatMedic_PlayerController::SprintStop);
+		Input->BindAction(IA_Pause, ETriggerEvent::Started, this, &ACombatMedic_PlayerController::PauseGame);
 	}
 
 	else
@@ -114,6 +115,11 @@ void ACombatMedic_PlayerController::SprintStop()
 {
 	if (PlayerMedic == nullptr) return;
 	PlayerMedic->StopSprinting();
+}
+
+void ACombatMedic_PlayerController::PauseGame()
+{
+	PauseGameEvent.Broadcast();
 }
 
 void ACombatMedic_PlayerController::SwitchToPatientCamera()

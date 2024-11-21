@@ -6,9 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "CombatMedic_PlayerController.generated.h"
 
-/**
- * 
- */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGameDelegate);
+
 UCLASS()
 class GAD221_COMBATMEDIC_API ACombatMedic_PlayerController : public APlayerController
 {
@@ -43,6 +42,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UInputAction* IA_Sprint;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UInputAction* IA_Pause;
+
 	UFUNCTION()
 	virtual void SetupInputComponent() override;
 
@@ -69,6 +71,8 @@ protected:
 
 	UFUNCTION()
 	void SprintStop();
+
+	
 	
 public:
 	UFUNCTION()
@@ -79,4 +83,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	UShapeComponent* ComponentUnderMouse();
+
+	UPROPERTY(BlueprintAssignable)
+	FPauseGameDelegate PauseGameEvent;
+
+	UFUNCTION(BlueprintCallable)
+	void PauseGame();
 };
