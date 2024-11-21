@@ -10,3 +10,7 @@ void ACombatMedic_HUD::ShowMedicInterface_Implementation()
 void ACombatMedic_HUD::ShowCombatHUD_Implementation()
 {
 }
+
+void ACombatMedic_HUD::ShowEndScreen_Implementation()
+{
+}

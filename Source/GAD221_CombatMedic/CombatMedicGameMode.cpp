@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "SoldierAIController.h"
 #include "EnemySpawner.h"
+#include "CombatMedic_HUD.h"
 
 void ACombatMedicGameMode::BeginPlay()
 {
@@ -64,6 +65,7 @@ void ACombatMedicGameMode::BeginPlay()
 void ACombatMedicGameMode::BeginCombat(int Index)
 {
 	if (CombatIndex == Index) return;
+	UE_LOG(LogTemp, Warning, TEXT("Begining Fight %d"), CombatIndex);
 	CombatIndex = Index;
 
 	TArray<ASoldierWaypoint*> AllyCombatPositions;
@@ -107,6 +109,9 @@ void ACombatMedicGameMode::TryEndCombat()
 		{
 			Enemy->Death();
 		}
+
+		UE_LOG(LogTemp, Warning, TEXT("Begining Fight %d"), CombatIndex);
+		CombatIndex = 0;
 	}
 }
 
@@ -132,4 +137,35 @@ bool ACombatMedicGameMode::AllAlliesStanding()
 		}
 	}
 	return true;
+}
+
+bool ACombatMedicGameMode::AllAlliesDown()
+{
+	for (ASoldier* Soldier : AllySoldiers)
+	{
+		if (!Soldier->IsDowned())
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+void ACombatMedicGameMode::PlayerEnteredDangerZone()
+{
+	bPlayerDied = true;
+	Cast<ACombatMedic_HUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->ShowEndScreen();
+}
+
+void ACombatMedicGameMode::SoldiersGotToLevelEnd()
+{
+	bLevelEnded = true;
+	Cast<ACombatMedic_HUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->ShowEndScreen();
+}
+
+void ACombatMedicGameMode::EndIfAllySoldiersAllDown()
+{
+	if (!AllAlliesDown()) return;
+	bAllAlliesDown = true;
+	Cast<ACombatMedic_HUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->ShowEndScreen();
 }

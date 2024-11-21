@@ -16,7 +16,6 @@ ASoldierWaypoint::ASoldierWaypoint()
 
 	Proximity = CreateDefaultSubobject<USphereComponent>(TEXT("Interaction Proximity"));
 	SetRootComponent(Proximity);
-	//Proximity->SetupAttachment(GetRootComponent());
 	Proximity->SetSphereRadius(50);
 	Proximity->OnComponentBeginOverlap.AddDynamic(this, &ASoldierWaypoint::OnOverlapBegin);
 	Proximity->OnComponentEndOverlap.AddDynamic(this, &ASoldierWaypoint::OnOverlapEnd);
@@ -35,10 +34,6 @@ void ASoldierWaypoint::OnOverlapBegin(UPrimitiveComponent* newComp, AActor* Othe
 	ASoldier* Soldier = Cast<ASoldier>(OtherActor);
 	if (Soldier == nullptr || SoldierInOverlap == Soldier) return;
 
-	
-
-	
-
 	if (WaypointType == Travel)
 	{
 		Soldier->SoldierAI()->ArrivedAtWaypoint(Index);
@@ -48,7 +43,8 @@ void ASoldierWaypoint::OnOverlapBegin(UPrimitiveComponent* newComp, AActor* Othe
 	{
 		SoldierInOverlap = Soldier;
 		Soldier->SetCrouching(CrouchingAmmount);
-		UE_LOG(LogTemp, Warning, TEXT("%s entered %s"), *Soldier->GetName(), *GetName());
+		//UE_LOG(LogTemp, Warning, TEXT("%s entered %s"), *Soldier->GetName(), *GetName());
+		Soldier->Combat->LookAtFirstFirePosition();
 	}
 }
 

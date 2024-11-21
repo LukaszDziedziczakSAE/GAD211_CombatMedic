@@ -17,4 +17,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ShowCombatHUD();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ShowEndScreen();
 };

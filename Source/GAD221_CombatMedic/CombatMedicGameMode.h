@@ -35,7 +35,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int CombatIndex;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bPlayerDied;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bLevelEnded;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bAllAlliesDown;
+
 public:
+
 	UFUNCTION(BlueprintCallable)
 	ASoldierWaypoint* GetFirstTravelWaypoint() { return FirstTravelWaypoint; }
 
@@ -50,4 +60,19 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool AllAlliesStanding();
+
+	UFUNCTION(BlueprintCallable)
+	bool AllAlliesDown();
+
+	UFUNCTION(BlueprintCallable)
+	void PlayerEnteredDangerZone();
+
+	UFUNCTION(BlueprintCallable)
+	void SoldiersGotToLevelEnd();
+
+	UFUNCTION(BlueprintCallable)
+	void EndIfAllySoldiersAllDown();
+
+	UFUNCTION(BlueprintPure)
+	int GetCombatIndex() { return CombatIndex; }
 };

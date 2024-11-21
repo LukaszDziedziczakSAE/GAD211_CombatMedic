@@ -164,3 +164,12 @@ void USoldierCombat::EndCombat()
 	FightingPosition = nullptr;
 }
 
+void USoldierCombat::LookAtFirstFirePosition()
+{
+	if (FightingPosition == nullptr) return;
+
+	FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(Soldier->GetActorLocation(), FightingPosition->TargetFightingPositions[0]->GetActorLocation());
+
+	Soldier->SetActorRotation(LookAtRot, ETeleportType::TeleportPhysics);
+}
+

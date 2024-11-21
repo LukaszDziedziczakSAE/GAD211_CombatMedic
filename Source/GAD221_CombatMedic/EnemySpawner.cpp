@@ -19,6 +19,10 @@ void AEnemySpawner::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (EnemyPrefab == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s missing EnemyPrefab"), *GetName());
+	}
 }
 
 // Called every frame
@@ -31,6 +35,11 @@ void AEnemySpawner::Tick(float DeltaTime)
 ASoldier* AEnemySpawner::SpawnEnemy()
 {
 	ASoldier* NewSoldier = GetWorld()->SpawnActor<ASoldier>(EnemyPrefab, GetActorLocation(), GetActorRotation());
+	if (NewSoldier == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s failed to spawn Soldier"), *GetName());
+		return nullptr;
+	}
 
 	if (GoToWaypoint == nullptr)
 	{

@@ -135,48 +135,6 @@ ASoldier::ASoldier()
 	LeftLegColider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	LeftLegColider->SetCanEverAffectNavigation(false);
 
-	//TopMesh->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Top"));
-	//TopMesh->SetupAttachment(GetMesh());
-
-	//Bottom->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Bottom"));
-	//Bottom->SetupAttachment(GetMesh());
-
-	//Shoes->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Shoes"));
-	//Shoes->SetupAttachment(GetMesh());
-
-	//Arms->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Arms"));
-	//Arms->SetupAttachment(GetMesh());
-
-	//Vest->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Vest"));
-	//Vest->SetupAttachment(GetMesh());
-
-	//VestAccesories->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("VestAccesories"));
-	//VestAccesories->SetupAttachment(GetMesh());
-
-	//Belt->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Belt"));
-	//Belt->SetupAttachment(GetMesh());
-
-	//Helmet->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Helmet"));
-	//Helmet->SetupAttachment(GetMesh());
-
-	//KneepadL->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("KneepadL"));
-	//KneepadL->SetupAttachment(GetMesh());
-
-	//KneepadR->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("KneepadR"));
-	//KneepadR->SetupAttachment(GetMesh());
-
-	//Headset->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Headset"));
-	//Headset->SetupAttachment(GetMesh());
-
-	//HelmetStrap->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HelmetStrap"));
-	//HelmetStrap->SetupAttachment(GetMesh());
-
-	//Goggles->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Goggles"));
-	//Goggles->SetupAttachment(GetMesh());
-
-	//Weapon->CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
-	//Weapon->SetupAttachment(GetMesh());
-
 	Combat = CreateDefaultSubobject<USoldierCombat>(TEXT("Combat"));
 
 	TorsoBleed = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Torso Bleed"));
@@ -347,6 +305,8 @@ void ASoldier::SetCrouching(float Value)
 
 void ASoldier::EngageCombat(ASoldierWaypoint* FightingPosition)
 {
+	//UE_LOG(LogTemp, Warning, TEXT("%s combat start"), *GetName());
+	
 	bIsInCombat = true;
 	if (AI != nullptr) AI->SetIsInCombat(bIsInCombat);
 	else UE_LOG(LogTemp, Error, TEXT("%s missing AI"), *GetName());

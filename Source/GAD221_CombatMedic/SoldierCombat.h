@@ -65,4 +65,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void EndCombat();
+
+	UFUNCTION(BlueprintCallable)
+	void LookAtFirstFirePosition();
 };
