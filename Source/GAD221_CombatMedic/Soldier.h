@@ -283,6 +283,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Death();
 
+	UFUNCTION(BlueprintCallable)
+	void StartDeathBleed();
+
 	UFUNCTION(BlueprintPure)
 	bool IsAlive() { return bIsAlive; }
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UAudioComponent* VoiceAudioComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class USoldierVoiceComponent* Voice;
 };

@@ -9,6 +9,7 @@
 #include "Components/ShapeComponent.h"
 #include "MedicInventory.h"
 #include "ItemPickup.h"
+#include "SoldierVoiceComponent.h"
 
 // Sets default values for this component's properties
 UMedicInteraction::UMedicInteraction()
@@ -65,6 +66,7 @@ void UMedicInteraction::Interact()
 		bGivingMedicalAid = true;
 		HUD->ShowMedicInterface();
 		Player->PlayerController->SwitchToPatientCamera();
+		Patient->Voice->bPlayGrunting = true;
 	}
 
 	else if (bGivingMedicalAid)
@@ -72,6 +74,7 @@ void UMedicInteraction::Interact()
 		bGivingMedicalAid = false;
 		HUD->ShowCombatHUD();
 		Player->PlayerController->SwitchToBackToMainCamera();
+		Patient->Voice->bPlayGrunting = false;
 	}
 }
 
@@ -107,6 +110,10 @@ void UMedicInteraction::EndMedicalItemApplication(UShapeComponent* HitShape)
 			BodyPartSelected = BodyPart;
 			ApplicationCurrent = 0;
 		}
+		else
+		{
+			Patient->Voice->PlayGruntingNegative();
+		}
 	}
 	
 	else
@@ -126,7 +133,13 @@ void UMedicInteraction::CompleteMedicalItemApplication()
 		Patient->HealPain(AmountByAffect(InteractionType, BodyPartSelected));
 	}
 
-	else Patient->HealInjury(AmountByAffect(InteractionType, BodyPartSelected));
+	else
+	{
+		float HealAmount = AmountByAffect(InteractionType, BodyPartSelected);
+
+		if (HealAmount > 0) Patient->HealInjury(HealAmount);
+		else Patient->Voice->PlayGruntingNegative();
+	}
 
 	if (!Patient->IsDowned())
 	{

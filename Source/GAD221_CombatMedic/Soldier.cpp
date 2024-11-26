@@ -17,6 +17,8 @@
 #include "NiagaraComponent.h"
 #include "CombatMedicGameMode.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "SoldierVoiceComponent.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values
 ASoldier::ASoldier()
@@ -185,6 +187,11 @@ ASoldier::ASoldier()
 	DeathBleed = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Death Bleed"));
 	DeathBleed->SetupAttachment(GetMesh(), TEXT("spine_02"));
 	DeathBleed->bAutoActivate = false;
+
+	VoiceAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Voice Audio"));
+	VoiceAudioComponent->SetupAttachment(GetMesh(), TEXT("head"));
+
+	Voice = CreateDefaultSubobject<USoldierVoiceComponent>(TEXT("Voice Component"));
 }
 
 // Called when the game starts or when spawned
@@ -291,6 +298,8 @@ void ASoldier::SetInjury(FInjury NewInjury)
 
 	float PainDeduction = UKismetMathLibrary::RandomFloatInRange(50.0f, 100.0f);
 	CurrentPain = FMath::Clamp((CurrentPain + PainDeduction), 0.0f, MaxPain);
+
+	Voice->PlayGotHit();
 }
 
 void ASoldier::SetRandomInjury()
@@ -325,12 +334,18 @@ void ASoldier::HealInjury(float Amount)
 	{
 		Injury.BodyPart = None;
 		StopAllBleeding();
+		Voice->PlayHealed();
+	}
+	else
+	{
+		Voice->PlayGruntingPositive();
 	}
 }
 
 void ASoldier::HealPain(float Amount)
 {
 	CurrentPain = FMath::Clamp(CurrentPain - Amount, 0, MaxPain);
+	Voice->PlayGruntingPositive();
 }
 
 void ASoldier::SetCrouching(float Value)
@@ -435,12 +450,18 @@ void ASoldier::Death()
 	TArray<USkeletalMeshComponent*> ChildrenComponents;
 	GetComponents<USkeletalMeshComponent>(ChildrenComponents);
 
-	GetMesh()->Stop();
+	//GetMesh()->Stop();
 
 	FVector DeathLocation = GetMesh()->GetRelativeLocation();
 	DeathLocation.Z -= 5;
 	GetMesh()->SetRelativeLocation(DeathLocation);
 
+	FTimerHandle DeathBleedTimer;
+	GetWorld()->GetTimerManager().SetTimer(DeathBleedTimer, this , &ASoldier::StartDeathBleed, 1.0f, false);
+}
+
+void ASoldier::StartDeathBleed()
+{
 	DeathBleed->Activate();
 }
 

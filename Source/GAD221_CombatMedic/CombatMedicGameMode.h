@@ -11,6 +11,9 @@ class GAD221_COMBATMEDIC_API ACombatMedicGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
+public:
+	ACombatMedicGameMode();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -44,7 +47,23 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bAllAlliesDown;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float CombatVoiceCountdown;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float CombatVoiceMinTime{5.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float CombatVoiceMaxTime{10.0f};
+
+	UFUNCTION()
+	void SetNewCombatVoiceCountdown();
+
+	UFUNCTION()
+	class ASoldier* RandomSoldierInSquad();
+
 public:
+	virtual void Tick(float DeltaSeconds) override;
 
 	UFUNCTION(BlueprintCallable)
 	ASoldierWaypoint* GetFirstTravelWaypoint() { return FirstTravelWaypoint; }

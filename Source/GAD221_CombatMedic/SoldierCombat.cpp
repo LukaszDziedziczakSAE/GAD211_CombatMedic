@@ -18,7 +18,7 @@ USoldierCombat::USoldierCombat()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
+	
 }
 
 
@@ -96,7 +96,7 @@ void USoldierCombat::Fire()
 		float Random = UKismetMathLibrary::RandomFloatInRange(0, 1);
 		if (Random <= ChanceToHit)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s hit %s"), *Soldier->GetName(), *Opponent->GetName());
+			UE_LOG(LogTemp, Display, TEXT("%s hit %s"), *Soldier->GetName(), *Opponent->GetName());
 			Opponent->SetRandomInjury();
 
 			if (Soldier->SoldierSide == Allied)
@@ -108,7 +108,7 @@ void USoldierCombat::Fire()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s missed %s"), *Soldier->GetName(), *Opponent->GetName());
+			UE_LOG(LogTemp, Display, TEXT("%s missed %s"), *Soldier->GetName(), *Opponent->GetName());
 		}
 
 		ChanceToHit += ChanceToHitIncreasePerShot;

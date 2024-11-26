@@ -9,9 +9,18 @@
 #include "SoldierAIController.h"
 #include "EnemySpawner.h"
 #include "CombatMedic_HUD.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "SoldierVoiceComponent.h"
+
+ACombatMedicGameMode::ACombatMedicGameMode()
+{
+	PrimaryActorTick.bCanEverTick = true;
+}
 
 void ACombatMedicGameMode::BeginPlay()
 {
+	Super::BeginPlay();
+
 	TArray<AActor*> WaypointActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASoldierWaypoint::StaticClass(), WaypointActors);
 	
@@ -62,6 +71,43 @@ void ACombatMedicGameMode::BeginPlay()
 	}
 }
 
+void ACombatMedicGameMode::SetNewCombatVoiceCountdown()
+{
+	CombatVoiceCountdown = UKismetMathLibrary::RandomFloatInRange(CombatVoiceMinTime, CombatVoiceMaxTime);
+}
+
+ASoldier* ACombatMedicGameMode::RandomSoldierInSquad()
+{
+	ASoldier* Soldier = nullptr;
+	while (Soldier == nullptr)
+	{
+		int RanSoldierIndex = UKismetMathLibrary::RandomInteger64InRange(0, AllySoldiers.Num() - 1);
+		if (AllySoldiers[RanSoldierIndex]->IsAlive() && !AllySoldiers[RanSoldierIndex]->IsDowned())
+		{
+			Soldier = AllySoldiers[RanSoldierIndex];
+		}
+	}
+
+	return Soldier;
+}
+
+void ACombatMedicGameMode::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	//UE_LOG(LogTemp, Warning, TEXT("GameMode tick"));
+	if (CombatIndex != 0)
+	{
+		if (CombatVoiceCountdown > 0) CombatVoiceCountdown -= DeltaSeconds;
+
+		if (CombatVoiceCountdown <= 0)
+		{
+			RandomSoldierInSquad()->Voice->PlayCombatInProgress();
+			SetNewCombatVoiceCountdown();
+		}
+	}
+}
+
 void ACombatMedicGameMode::BeginCombat(int Index)
 {
 	if (CombatIndex == Index) return;
@@ -95,6 +141,9 @@ void ACombatMedicGameMode::BeginCombat(int Index)
 			if (Enemy != nullptr) EnemySoldiers.Add(Enemy);
 		}
 	}
+
+	RandomSoldierInSquad()->Voice->PlayCombatStart();
+	SetNewCombatVoiceCountdown();
 }
 
 void ACombatMedicGameMode::TryEndCombat()
@@ -113,6 +162,8 @@ void ACombatMedicGameMode::TryEndCombat()
 
 		UE_LOG(LogTemp, Warning, TEXT("Begining Fight %d"), CombatIndex);
 		CombatIndex = 0;
+
+		RandomSoldierInSquad()->Voice->PlayCombatEnd();
 	}
 }
 
