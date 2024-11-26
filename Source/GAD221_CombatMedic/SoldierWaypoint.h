@@ -67,4 +67,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<ASoldierWaypoint*> TargetFightingPositions;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	ASoldier* AssignedSoldier;
+
+	UFUNCTION(BlueprintCallable)
+	FVector RandomPointInRadius();
 };

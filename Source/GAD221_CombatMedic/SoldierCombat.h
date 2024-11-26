@@ -32,6 +32,33 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float ChanceToHitBase;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UNiagaraComponent* MuzzleFlash;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	class UAnimMontage* StandingShotMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	class UAnimMontage* CrouchingShotMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	USoundBase* WeaponFireSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int BurstIndex{ -1 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int BurstTotal{ 4 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float FireRate{ 0.1f };
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float FireIndex{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float CrouchingThreshhold{ 0.5f };
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -77,4 +104,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ResetChanceToHit();
+
+	UFUNCTION(BlueprintCallable)
+	void FireBurst();
 };

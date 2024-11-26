@@ -48,6 +48,12 @@ void UMedicInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 			CompleteMedicalItemApplication();
 		}
 	}
+
+	if (bGivingMedicalAid && (Patient == nullptr || !Patient->IsDowned() || !Patient->IsAlive()))
+	{
+		Interact();
+		Patient = nullptr;
+	}
 }
 
 void UMedicInteraction::Interact()
@@ -89,11 +95,14 @@ void UMedicInteraction::EndMedicalItemApplication(UShapeComponent* HitShape)
 
 	if (HitShape != nullptr)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Apply to %s"), *HitShape->GetName());
-
 		TEnumAsByte<EBodyPart> BodyPart = Patient->BodyPartFromShape(HitShape);
 
-		if (BodyPart == Patient->GetInjury().BodyPart)
+		if (InteractionType == PainKiller)
+		{
+			BodyPartSelected = BodyPart;
+			ApplicationCurrent = 0;
+		}
+		else if (BodyPart == Patient->GetInjury().BodyPart)
 		{
 			BodyPartSelected = BodyPart;
 			ApplicationCurrent = 0;
@@ -112,7 +121,12 @@ void UMedicInteraction::CompleteMedicalItemApplication()
 {
 	if (BodyPartSelected == None) return;
 
-	Patient->HealInjury(AmountByAffect(InteractionType, BodyPartSelected));
+	if (InteractionType == PainKiller)
+	{
+		Patient->HealPain(AmountByAffect(InteractionType, BodyPartSelected));
+	}
+
+	else Patient->HealInjury(AmountByAffect(InteractionType, BodyPartSelected));
 
 	if (!Patient->IsDowned())
 	{
@@ -130,7 +144,12 @@ float UMedicInteraction::AmountByAffect(TEnumAsByte<EMedicalItemType> ItemType, 
 {
 	for (FMedicalAffect Affect : MedicalAffects)
 	{
-		if (Affect.ItemType == ItemType && Affect.BodyPart == BodyPart)
+		if (ItemType == PainKiller && Affect.ItemType == PainKiller)
+		{
+			return Affect.Amount;
+		}
+
+		else if (Affect.ItemType == ItemType && Affect.BodyPart == BodyPart)
 		{
 			return Affect.Amount;
 		}
