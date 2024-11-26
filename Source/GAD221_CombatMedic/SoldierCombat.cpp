@@ -187,24 +187,31 @@ bool USoldierCombat::TrySetOpponent()
 	int MaxLoop = 1000;
 	int Loop = 0;
 
-	while (Loop < MaxLoop)
+	if (FightingPosition->TargetFightingPositions.Num() == 0)
 	{
-		for (ASoldierWaypoint* CombatWaypoint : FightingPosition->TargetFightingPositions)
+		SetOpponentSoldier(NearestEnemySoldier());
+		return Opponent != nullptr;
+	}
+	else
+	{
+		while (Loop < MaxLoop)
 		{
-			if (CombatWaypoint->AssignedSoldier != nullptr && !CombatWaypoint->AssignedSoldier->IsDowned())
+			for (ASoldierWaypoint* CombatWaypoint : FightingPosition->TargetFightingPositions)
 			{
-				SetOpponentSoldier(CombatWaypoint->AssignedSoldier);
-				return true;
+				if (CombatWaypoint->AssignedSoldier != nullptr && !CombatWaypoint->AssignedSoldier->IsDowned())
+				{
+					SetOpponentSoldier(CombatWaypoint->AssignedSoldier);
+					return true;
+				}
+
+				/*if (CombatWaypoint->SoldierInOverlap != nullptr && !CombatWaypoint->SoldierInOverlap->IsDowned())
+				{
+					SetOpponentSoldier(CombatWaypoint->SoldierInOverlap);
+					return true;
+				}*/
 			}
-
-
-			/*if (CombatWaypoint->SoldierInOverlap != nullptr && !CombatWaypoint->SoldierInOverlap->IsDowned())
-			{
-				SetOpponentSoldier(CombatWaypoint->SoldierInOverlap);
-				return true;
-			}*/
+			Loop++;
 		}
-		Loop++;
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Did not find opponent"));
@@ -248,5 +255,44 @@ void USoldierCombat::FireBurst()
 	LookAtOpponent();
 	BurstIndex = UKismetMathLibrary::RandomIntegerInRange(0, BurstTotal);
 	FireIndex = 0;
+}
+
+ASoldier* USoldierCombat::NearestEnemySoldier()
+{
+	TArray<AActor*> SoldierActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASoldier::StaticClass(), SoldierActors);
+	TArray<ASoldier*> Enemies;
+	for (AActor* SoldierActor : SoldierActors)
+	{
+		ASoldier* ListSoldier = Cast<ASoldier>(SoldierActor);
+		if (ListSoldier == nullptr || 
+			ListSoldier->SoldierSide == Soldier->SoldierSide ||
+			!ListSoldier->IsAlive() ||
+			!ListSoldier->IsDowned()
+			) continue;
+
+		Enemies.Add(ListSoldier);
+	}
+
+	ASoldier* NearestSoldier = nullptr;
+	float NearestSoldierDistance = 100000.0f;
+	for (ASoldier* Enemy : Enemies)
+	{
+		float Distance = FVector::Distance(Enemy->GetActorLocation(), Soldier->GetActorLocation());
+
+		if (NearestSoldier == nullptr)
+		{
+			NearestSoldier = Enemy;
+			NearestSoldierDistance = Distance;
+		}
+
+		else if (Distance < NearestSoldierDistance)
+		{
+			NearestSoldier = Enemy;
+			NearestSoldierDistance = Distance;
+		}
+	}
+
+	return NearestSoldier;
 }
 

@@ -107,4 +107,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void FireBurst();
+
+	UFUNCTION(BlueprintCallable)
+	ASoldier* NearestEnemySoldier();
 };

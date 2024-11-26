@@ -203,7 +203,7 @@ void ASoldier::BeginPlay()
 
 void ASoldier::OnOverlapBegin(UPrimitiveComponent* newComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!bIsDowned || SoldierSide != Allied) return;
+	if (!bIsDowned || !bIsAlive || SoldierSide != Allied) return;
 
 	APlayerMedic* Player = Cast<APlayerMedic>(OtherActor);
 	if (Player == nullptr) return;
@@ -213,7 +213,8 @@ void ASoldier::OnOverlapBegin(UPrimitiveComponent* newComp, AActor* OtherActor, 
 
 void ASoldier::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (!bIsDowned || SoldierSide != Allied) return;
+	if (!bIsDowned || !bIsAlive || SoldierSide != Allied) return;
+
 	APlayerMedic* Player = Cast<APlayerMedic>(OtherActor);
 	if (Player == nullptr) return;
 
