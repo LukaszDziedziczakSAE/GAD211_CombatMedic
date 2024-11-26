@@ -39,7 +39,7 @@ void ASoldierAIController::OnPossess(APawn* InPawn)
 				TravelWaypoints.Add(Waypoint);
 				if (Waypoint->GetIndex() == 0)
 				{
-					SetWaypoint(Waypoint->GetActorLocation());
+					SetWaypoint(Waypoint->RandomPointInRadius());
 				}
 			}
 
@@ -98,7 +98,7 @@ void ASoldierAIController::GoToLastWaypointSet()
 	{
 		if (Waypoint->GetIndex() == LastTravelWaypointIndex)
 		{
-			SetWaypoint(Waypoint->GetActorLocation());
+			SetWaypoint(Waypoint->RandomPointInRadius());
 		}
 	}
 }

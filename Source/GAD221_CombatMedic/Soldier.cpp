@@ -16,6 +16,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 #include "CombatMedicGameMode.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ASoldier::ASoldier()
@@ -236,9 +237,36 @@ void ASoldier::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!bIsAlive) return;
+
 	if (Injury.BodyPart != None)
 	{
-		CurrentHealth -= (Injury.CurrentAmount / 60) * DeltaTime;
+		CurrentHealth = FMath::Clamp( (CurrentHealth - (Injury.CurrentAmount / 60) * DeltaTime * InjuryHealthLossMultiplier), 0, MaxHealth);
+
+		if (CurrentHealth == 0)
+		{
+			Death();
+		}
+	}
+
+	else
+	{
+		if (CurrentHealth < MaxHealth)
+		{
+			CurrentHealth = FMath::Clamp(CurrentHealth + (HealthRecoveryRate * DeltaTime), 0, MaxHealth);
+		}
+
+		if (CurrentPain > 0)
+		{
+			CurrentPain = FMath::Clamp((CurrentPain - (PainRecoveryRate * DeltaTime)), 0, MaxPain);
+		}
+
+		if (bIsDowned && CurrentPain < PainThreshhold)
+		{
+			bIsDowned = false;
+			AI->SetIsDowned(bIsDowned);
+			Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->TryEndCombat();
+		}
 	}
 }
 
@@ -257,6 +285,11 @@ void ASoldier::SetInjury(FInjury NewInjury)
 	bIsDowned = true;
 	if (AI != nullptr) AI->SetIsDowned(bIsDowned);
 	StartBleeding(Injury.BodyPart);
+	float HealthDeduction = UKismetMathLibrary::RandomFloatInRange(100.0f, 200.0f);
+	CurrentHealth = FMath::Clamp((CurrentHealth - HealthDeduction), 0.0f, MaxHealth);
+
+	float PainDeduction = UKismetMathLibrary::RandomFloatInRange(50.0f, 100.0f);
+	CurrentPain = FMath::Clamp((CurrentPain + PainDeduction), 0.0f, MaxPain);
 }
 
 void ASoldier::SetRandomInjury()
@@ -290,11 +323,13 @@ void ASoldier::HealInjury(float Amount)
 	if (Injury.CurrentAmount == 0)
 	{
 		Injury.BodyPart = None;
-		bIsDowned = false;
-		AI->SetIsDowned(bIsDowned);
 		StopAllBleeding();
-		Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->TryEndCombat();
 	}
+}
+
+void ASoldier::HealPain(float Amount)
+{
+	CurrentPain = FMath::Clamp(CurrentPain - Amount, 0, MaxPain);
 }
 
 void ASoldier::SetCrouching(float Value)

@@ -55,6 +55,24 @@ protected:
 	float CurrentHealth{ 1000.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float HealthRecoveryRate{ 50.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MaxPain{ 100.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CurrentPain{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float PainThreshhold{ 50.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float PainRecoveryRate{ 10.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float InjuryHealthLossMultiplier{ 2.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float WalkingSpeed{ 200 };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -214,11 +232,17 @@ public:
 	UFUNCTION(BlueprintPure)
 	float HealthPercentage() { return CurrentHealth / MaxHealth; }
 
+	UFUNCTION(BlueprintPure)
+	float PainPercentage() { return CurrentPain / MaxPain; }
+
 	UFUNCTION(BlueprintCallable)
 	TEnumAsByte<EBodyPart> BodyPartFromShape(UShapeComponent* Shape);
 
 	UFUNCTION(BlueprintCallable)
 	void HealInjury(float Amount);
+
+	UFUNCTION(BlueprintCallable)
+	void HealPain(float Amount);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class ASoldierWaypoint* FightingPosition1;
@@ -238,6 +262,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetCrouching(float Value);
 
+	UFUNCTION(BlueprintPure)
+	float GetCrouching() { return Crouching; }
+
 	UFUNCTION(BlueprintCallable)
 	void EngageCombat(ASoldierWaypoint* FightingPosition);
 
@@ -255,4 +282,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void Death();
+
+	UFUNCTION(BlueprintPure)
+	bool IsAlive() { return bIsAlive; }
 };

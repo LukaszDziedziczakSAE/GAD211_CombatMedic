@@ -7,6 +7,9 @@
 #include "SoldierWaypoint.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "CombatMedicGameMode.h"
+#include "NiagaraComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values for this component's properties
 USoldierCombat::USoldierCombat()
@@ -26,6 +29,14 @@ void USoldierCombat::BeginPlay()
 
 	Soldier = Cast<ASoldier>(GetOwner());
 	ChanceToHitBase = ChanceToHit;
+	
+	MuzzleFlash = Cast<UNiagaraComponent>(Soldier->GetComponentsByTag(UNiagaraComponent::StaticClass(), TEXT("MuzzleFlash"))[0]);
+	if (MuzzleFlash == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s did not find muzzle flash"), *Soldier->GetName());
+	}
+
+	FireIndex = FireRate;
 }
 
 
@@ -34,7 +45,11 @@ void USoldierCombat::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	if (BurstIndex >= 0)
+	{
+		if (FireIndex >= FireRate) Fire();
+		else FireIndex += DeltaTime;
+	}
 }
 
 void USoldierCombat::SetFightingPosition(ASoldierWaypoint* Waypoint)
@@ -56,7 +71,8 @@ void USoldierCombat::SetFightingPosition(ASoldierWaypoint* Waypoint)
 		UE_LOG(LogTemp, Error, TEXT("Missing Soldier AI reference in SoldierCombat"));
 		return;
 	}
-		
+	
+	FightingPosition->AssignedSoldier = Soldier;
 	Soldier->SoldierAI()->SetWaypoint(FightingPosition->GetActorLocation());
 }
 
@@ -69,26 +85,54 @@ void USoldierCombat::Fire()
 {
 	if (Opponent == nullptr || FightingPosition->SoldierInOverlap != Soldier) return;
 
-	float Random = UKismetMathLibrary::RandomFloatInRange(0, 1);
-
-	if (Random <= ChanceToHit)
+	if (Opponent->IsDowned() || Soldier->IsDowned())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s hit %s"), *Soldier->GetName(), *Opponent->GetName());
-		Opponent->SetRandomInjury();
+		ClearOpponent();
+		return;
+	}
 
-		if (Soldier->SoldierSide == Allied)
+	if (BurstIndex == 0)
+	{
+		float Random = UKismetMathLibrary::RandomFloatInRange(0, 1);
+		if (Random <= ChanceToHit)
 		{
-			Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->TryEndCombat();
+			UE_LOG(LogTemp, Warning, TEXT("%s hit %s"), *Soldier->GetName(), *Opponent->GetName());
+			Opponent->SetRandomInjury();
+
+			if (Soldier->SoldierSide == Allied)
+			{
+				Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->TryEndCombat();
+			}
+
+			Opponent = nullptr;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s missed %s"), *Soldier->GetName(), *Opponent->GetName());
 		}
 
-		Opponent = nullptr;
+		ChanceToHit += ChanceToHitIncreasePerShot;
+	}
+
+	if (MuzzleFlash != nullptr) MuzzleFlash->Activate(true);
+
+	if (WeaponFireSound != nullptr && MuzzleFlash != nullptr)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), WeaponFireSound, MuzzleFlash->GetComponentLocation());
+	}
+
+	if (Soldier->GetCrouching() < CrouchingThreshhold)
+	{
+		Soldier->PlayAnimMontage(StandingShotMontage);
+		
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s missed %s"), *Soldier->GetName(), *Opponent->GetName());
+		Soldier->PlayAnimMontage(CrouchingShotMontage);
 	}
 
-	ChanceToHit += ChanceToHitIncreasePerShot;
+	FireIndex = 0;
+	BurstIndex--;
 }
 
 bool USoldierCombat::OpponentIsDown()
@@ -147,11 +191,18 @@ bool USoldierCombat::TrySetOpponent()
 	{
 		for (ASoldierWaypoint* CombatWaypoint : FightingPosition->TargetFightingPositions)
 		{
-			if (CombatWaypoint->SoldierInOverlap != nullptr && !CombatWaypoint->SoldierInOverlap->IsDowned())
+			if (CombatWaypoint->AssignedSoldier != nullptr && !CombatWaypoint->AssignedSoldier->IsDowned())
+			{
+				SetOpponentSoldier(CombatWaypoint->AssignedSoldier);
+				return true;
+			}
+
+
+			/*if (CombatWaypoint->SoldierInOverlap != nullptr && !CombatWaypoint->SoldierInOverlap->IsDowned())
 			{
 				SetOpponentSoldier(CombatWaypoint->SoldierInOverlap);
 				return true;
-			}
+			}*/
 		}
 		Loop++;
 	}
@@ -179,5 +230,23 @@ void USoldierCombat::LookAtFirstFirePosition()
 void USoldierCombat::ResetChanceToHit()
 {
 	ChanceToHit = ChanceToHitBase;
+}
+
+void USoldierCombat::FireBurst()
+{
+	if (Opponent == nullptr && !TrySetOpponent())
+	{
+		return;
+	}
+
+	if (Opponent->IsDowned())
+	{
+		Opponent = nullptr;
+		FireBurst();
+	}
+
+	LookAtOpponent();
+	BurstIndex = UKismetMathLibrary::RandomIntegerInRange(0, BurstTotal);
+	FireIndex = 0;
 }
 

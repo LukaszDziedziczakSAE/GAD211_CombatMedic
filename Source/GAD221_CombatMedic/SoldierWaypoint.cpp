@@ -6,6 +6,7 @@
 #include "Soldier.h"
 #include "SoldierAIController.h"
 #include "SoldierCombat.h"
+#include "NavigationSystem.h"
 
 
 // Sets default values
@@ -68,5 +69,23 @@ void ASoldierWaypoint::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+FVector ASoldierWaypoint::RandomPointInRadius()
+{
+	FVector Center = GetActorLocation();
+	float Radius = Proximity->GetScaledSphereRadius();
+
+	UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetCurrent(GetWorld());
+	if (NavSystem != nullptr)
+	{
+		FNavLocation Result;
+		if (NavSystem->GetRandomPointInNavigableRadius(Center, Radius, Result))
+		{
+			return Result.Location;
+		}
+	}
+
+	return Center;
 }
 
