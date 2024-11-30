@@ -18,7 +18,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<class ASoldier*> AllySoldiers;
+	TArray<class ASoldier*> AliedSoldiers;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<class ASoldier*> EnemySoldiers;

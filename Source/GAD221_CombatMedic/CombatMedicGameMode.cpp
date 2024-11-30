@@ -54,7 +54,7 @@ void ACombatMedicGameMode::BeginPlay()
 
 		if (Soldier->SoldierSide == Allied && FirstTravelWaypoint != nullptr)
 		{
-			AllySoldiers.Add(Soldier);
+			AliedSoldiers.Add(Soldier);
 			//Soldier->SoldierAI()->SetWaypoint(FirstTravelWaypoint->GetActorLocation());
 		}
 	}
@@ -81,10 +81,10 @@ ASoldier* ACombatMedicGameMode::RandomSoldierInSquad()
 	ASoldier* Soldier = nullptr;
 	while (Soldier == nullptr)
 	{
-		int RanSoldierIndex = UKismetMathLibrary::RandomInteger64InRange(0, AllySoldiers.Num() - 1);
-		if (AllySoldiers[RanSoldierIndex]->IsAlive() && !AllySoldiers[RanSoldierIndex]->IsDowned())
+		int RanSoldierIndex = UKismetMathLibrary::RandomInteger64InRange(0, AliedSoldiers.Num() - 1);
+		if (AliedSoldiers[RanSoldierIndex]->IsAlive() && !AliedSoldiers[RanSoldierIndex]->IsDowned())
 		{
-			Soldier = AllySoldiers[RanSoldierIndex];
+			Soldier = AliedSoldiers[RanSoldierIndex];
 		}
 	}
 
@@ -102,7 +102,11 @@ void ACombatMedicGameMode::Tick(float DeltaSeconds)
 
 		if (CombatVoiceCountdown <= 0)
 		{
-			RandomSoldierInSquad()->Voice->PlayCombatInProgress();
+			if (!AllEnemySoldiersDown())
+			{
+				RandomSoldierInSquad()->Voice->PlayCombatInProgress();
+			}
+			
 			SetNewCombatVoiceCountdown();
 		}
 	}
@@ -111,24 +115,32 @@ void ACombatMedicGameMode::Tick(float DeltaSeconds)
 void ACombatMedicGameMode::BeginCombat(int Index)
 {
 	if (CombatIndex == Index) return;
-	UE_LOG(LogTemp, Warning, TEXT("Begining Fight %d"), CombatIndex);
 	CombatIndex = Index;
+	UE_LOG(LogTemp, Warning, TEXT("Beginning Fight %d"), CombatIndex);
 
-	TArray<ASoldierWaypoint*> AllyCombatPositions;
+	TArray<ASoldierWaypoint*> AliedCombatPositions;
 	for (ASoldierWaypoint* SoldierWaypoint : CombatPositions)
 	{
 		if (SoldierWaypoint->GetIndex() == CombatIndex && SoldierWaypoint->GetSide() == Allied)
 		{
-			AllyCombatPositions.Add(SoldierWaypoint);
+			AliedCombatPositions.Add(SoldierWaypoint);
 		}
 	}
+	UE_LOG(LogTemp, Warning, TEXT("Found %d AliedCombatPositions"), AliedCombatPositions.Num());
 
-	for (ASoldier* AllySoldier : AllySoldiers)
+	for (ASoldier* AliedSoldier : AliedSoldiers)
 	{
-		if (AllyCombatPositions.Num() > 0)
+		if (!AliedSoldier->IsAlive()) continue;
+
+		if (AliedCombatPositions.Num() > 0)
 		{
-			AllySoldier->EngageCombat(AllyCombatPositions[0]);
-			AllyCombatPositions.RemoveAt(0);
+			int RandomPositionIndex = UKismetMathLibrary::RandomInteger64InRange(0, AliedCombatPositions.Num() - 1);
+			AliedSoldier->EngageCombat(AliedCombatPositions[RandomPositionIndex]);
+			AliedCombatPositions.RemoveAt(RandomPositionIndex);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Ran out of AliedCombatPositions for %s"), *AliedSoldier->GetName());
 		}
 	}
 
@@ -150,17 +162,17 @@ void ACombatMedicGameMode::TryEndCombat()
 {
 	if (AllEnemySoldiersDown() && AllAlliesStanding())
 	{
-		for (ASoldier* Soldier : AllySoldiers)
+		for (ASoldier* Soldier : AliedSoldiers)
 		{
 			Soldier->DisengageCombat();
 		}
 
 		for (ASoldier* Enemy : EnemySoldiers)
 		{
-			Enemy->Death();
+			if (Enemy->IsAlive()) Enemy->Death();
 		}
 
-		UE_LOG(LogTemp, Warning, TEXT("Begining Fight %d"), CombatIndex);
+		UE_LOG(LogTemp, Warning, TEXT("Ending Fight %d"), CombatIndex);
 		CombatIndex = 0;
 
 		RandomSoldierInSquad()->Voice->PlayCombatEnd();
@@ -181,7 +193,7 @@ bool ACombatMedicGameMode::AllEnemySoldiersDown()
 
 bool ACombatMedicGameMode::AllAlliesStanding()
 {
-	for (ASoldier* Soldier : AllySoldiers)
+	for (ASoldier* Soldier : AliedSoldiers)
 	{
 		if (Soldier->IsDowned())
 		{
@@ -193,9 +205,9 @@ bool ACombatMedicGameMode::AllAlliesStanding()
 
 bool ACombatMedicGameMode::AllAlliesDown()
 {
-	for (ASoldier* Soldier : AllySoldiers)
+	for (ASoldier* Soldier : AliedSoldiers)
 	{
-		if (!Soldier->IsDowned())
+		if (!Soldier->IsDowned() || Soldier->IsAlive())
 		{
 			return false;
 		}
