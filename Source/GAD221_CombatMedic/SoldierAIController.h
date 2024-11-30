@@ -33,6 +33,9 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable)
 	void SetWaypoint(FVector Location);
+
+	UFUNCTION(BlueprintCallable)
+	void SetFightingPosition(FVector Location);
 	
 	UFUNCTION(BlueprintCallable)
 	void SetOpponent(ASoldier* Opponent);

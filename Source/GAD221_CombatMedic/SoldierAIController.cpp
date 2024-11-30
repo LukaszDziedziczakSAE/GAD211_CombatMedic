@@ -69,6 +69,11 @@ void ASoldierAIController::SetWaypoint(FVector Location)
 	GetBlackboardComponent()->SetValueAsVector(TEXT("Waypoint"), Location);
 }
 
+void ASoldierAIController::SetFightingPosition(FVector Location)
+{
+	GetBlackboardComponent()->SetValueAsVector(TEXT("FightingPosition"), Location);
+}
+
 void ASoldierAIController::SetOpponent(ASoldier* Opponent)
 {
 	GetBlackboardComponent()->SetValueAsObject(TEXT("Opponent"), Opponent);

@@ -73,7 +73,7 @@ void USoldierCombat::SetFightingPosition(ASoldierWaypoint* Waypoint)
 	}
 	
 	FightingPosition->AssignedSoldier = Soldier;
-	Soldier->SoldierAI()->SetWaypoint(FightingPosition->GetActorLocation());
+	Soldier->SoldierAI()->SetFightingPosition(FightingPosition->GetActorLocation());
 }
 
 void USoldierCombat::ClearWaypoint()
