@@ -32,7 +32,7 @@ void ALevelEndTrigger::OnOverlapBegin(UPrimitiveComponent* newComp, AActor* Othe
 	if (GameMode == nullptr) return;
 
 	ASoldier* Soldier = Cast<ASoldier>(OtherActor);
-	if (Soldier != nullptr)
+	if (Soldier != nullptr && Soldier->SoldierSide == Allied)
 	{
 		GameMode->SoldiersGotToLevelEnd();
 	}

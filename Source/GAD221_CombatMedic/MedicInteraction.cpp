@@ -50,7 +50,7 @@ void UMedicInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		}
 	}
 
-	if (bGivingMedicalAid && (Patient == nullptr || !Patient->IsDowned() || !Patient->IsAlive()))
+	else if (bGivingMedicalAid && (Patient == nullptr || !Patient->IsDowned() || !Patient->IsAlive()))
 	{
 		Interact();
 		Patient = nullptr;
@@ -69,7 +69,7 @@ void UMedicInteraction::Interact()
 		Patient->Voice->bPlayGrunting = true;
 	}
 
-	else if (bGivingMedicalAid)
+	else if (bGivingMedicalAid && ApplicationCurrent == MedApplicationTime)
 	{
 		bGivingMedicalAid = false;
 		HUD->ShowCombatHUD();
@@ -139,12 +139,6 @@ void UMedicInteraction::CompleteMedicalItemApplication()
 
 		if (HealAmount > 0) Patient->HealInjury(HealAmount);
 		else Patient->Voice->PlayGruntingNegative();
-	}
-
-	if (!Patient->IsDowned())
-	{
-		Interact();
-		Patient = nullptr;
 	}
 
 	Player->MedicInventory->UseItemType(InteractionType);

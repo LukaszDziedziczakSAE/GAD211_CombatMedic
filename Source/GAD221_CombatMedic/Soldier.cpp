@@ -19,6 +19,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "SoldierVoiceComponent.h"
 #include "Components/AudioComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ASoldier::ASoldier()
@@ -236,7 +237,8 @@ void ASoldier::AdjustMovementSpeed()
 	}
 	else
 	{
-		GetCharacterMovement()->MaxWalkSpeed = bIsInCombat ? RunningSpeed : WalkingSpeed;
+		float NewWalkSpeed = UKismetMathLibrary::RandomFloatInRange(WalkingSpeed - WalkingSpeedDifference, WalkingSpeed - WalkingSpeedDifference);
+		GetCharacterMovement()->MaxWalkSpeed = bIsInCombat ? RunningSpeed : NewWalkSpeed;
 	}
 }
 
@@ -298,6 +300,8 @@ void ASoldier::SetInjury(FInjury NewInjury)
 
 	float PainDeduction = UKismetMathLibrary::RandomFloatInRange(50.0f, 100.0f);
 	CurrentPain = FMath::Clamp((CurrentPain + PainDeduction), 0.0f, MaxPain);
+
+	Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->EndIfAllySoldiersAllDown();
 
 	Voice->PlayGotHit();
 }
@@ -458,6 +462,9 @@ void ASoldier::Death()
 
 	FTimerHandle DeathBleedTimer;
 	GetWorld()->GetTimerManager().SetTimer(DeathBleedTimer, this , &ASoldier::StartDeathBleed, 1.0f, false);
+
+	//Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->TryEndCombat();
+	Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->EndIfAllySoldiersAllDown();
 }
 
 void ASoldier::StartDeathBleed()

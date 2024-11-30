@@ -37,10 +37,6 @@ void ASoldierAIController::OnPossess(APawn* InPawn)
 			if (Waypoint->GetWaypointType() == Travel)
 			{
 				TravelWaypoints.Add(Waypoint);
-				if (Waypoint->GetIndex() == 0)
-				{
-					SetWaypoint(Waypoint->RandomPointInRadius());
-				}
 			}
 
 			else if (Waypoint->GetWaypointType() == FightingPosition)
@@ -48,20 +44,33 @@ void ASoldierAIController::OnPossess(APawn* InPawn)
 				CombatPositions.Add(Waypoint);
 			}
 		}
-	}
 
-	/*else if (Soldier->SoldierSide == Enemy)
-	{
-		SetIsInCombat(true);
-
-		if (Soldier->Combat->GetFightingPosition() == nullptr)
+		ASoldierWaypoint* NearestWaypoint = nullptr;
+		float NearestWaypointDistance = 100000;
+		for (ASoldierWaypoint* Waypoint : TravelWaypoints)
 		{
-			UE_LOG(LogTemp, Error, TEXT("AI cannot find fighting position"));
-			return;
+			float Distance = FVector::Distance(Soldier->GetActorLocation(), Waypoint->GetActorLocation());
+
+			if (NearestWaypoint == nullptr)
+			{
+				NearestWaypoint = Waypoint;
+				NearestWaypointDistance = Distance;
+			}
+
+			else if (Distance < NearestWaypointDistance)
+			{
+				NearestWaypoint = Waypoint;
+				NearestWaypointDistance = Distance;
+			}
 		}
 
-		SetWaypoint(Soldier->Combat->GetFightingPosition()->GetActorLocation());
-	}*/
+		if (NearestWaypoint != nullptr)
+		{
+			LastTravelWaypointIndex = NearestWaypoint->GetIndex();
+			SetWaypoint(NearestWaypoint->RandomPointInRadius());
+		}
+		else UE_LOG(LogTemp, Error, TEXT("Did not find Nearest Waypoint"));
+	}
 }
 
 void ASoldierAIController::SetWaypoint(FVector Location)

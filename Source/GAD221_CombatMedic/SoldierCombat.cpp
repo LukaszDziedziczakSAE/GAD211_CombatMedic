@@ -180,7 +180,7 @@ bool USoldierCombat::TrySetOpponent()
 	}
 	if (FightingPosition == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s FightingPosition missing"), *Soldier->GetName());
+		UE_LOG(LogTemp, Error, TEXT("%s FightingPosition missing"), *Soldier->GetName());
 		return false;
 	}
 
@@ -228,6 +228,11 @@ void USoldierCombat::EndCombat()
 void USoldierCombat::LookAtFirstFirePosition()
 {
 	if (FightingPosition == nullptr) return;
+	if (FightingPosition->TargetFightingPositions.Num() == 0)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s FightingPosition missing Targets"), *FightingPosition->GetName());
+		return;
+	}
 
 	FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(Soldier->GetActorLocation(), FightingPosition->TargetFightingPositions[0]->GetActorLocation());
 

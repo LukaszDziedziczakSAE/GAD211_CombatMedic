@@ -76,6 +76,9 @@ protected:
 	float WalkingSpeed{ 200 };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float WalkingSpeedDifference{ 10.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float RunningSpeed{ 600 };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

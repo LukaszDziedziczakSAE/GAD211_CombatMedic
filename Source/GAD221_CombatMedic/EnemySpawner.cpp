@@ -34,21 +34,21 @@ void AEnemySpawner::Tick(float DeltaTime)
 
 ASoldier* AEnemySpawner::SpawnEnemy()
 {
-	ASoldier* NewSoldier = GetWorld()->SpawnActor<ASoldier>(EnemyPrefab, GetActorLocation(), GetActorRotation());
-	if (NewSoldier == nullptr)
-	{
-		UE_LOG(LogTemp, Error, TEXT("%s failed to spawn Soldier"), *GetName());
-		return nullptr;
-	}
-
 	if (GoToWaypoint == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("%s missing GoToWaypoint reference"), *GetName());
+		return nullptr;
 	}
-	else
+
+	ASoldier* NewSoldier = GetWorld()->SpawnActor<ASoldier>(EnemyPrefab, GetActorLocation(), GetActorRotation());
+	if (NewSoldier == nullptr)
 	{
-		NewSoldier->EngageCombat(GoToWaypoint);
+		UE_LOG(LogTemp, Error, TEXT("%s failed to spawn Soldier for %s"), *GetActorNameOrLabel(), *GoToWaypoint->GetActorNameOrLabel());
+		return nullptr;
 	}
+
+	
+	NewSoldier->EngageCombat(GoToWaypoint);
 	return NewSoldier;
 }
 

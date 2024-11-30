@@ -29,10 +29,13 @@ void ACombatStartTrigger::BeginPlay()
 
 void ACombatStartTrigger::OnOverlapBegin(UPrimitiveComponent* newComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (bHasTriggered) return;
+
 	ASoldier* Soldier = Cast<ASoldier>(OtherActor);
 	if (Soldier == nullptr) return;
 
 	Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->BeginCombat(CombatIndex);
+	bHasTriggered = true;
 }
 
 void ACombatStartTrigger::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
