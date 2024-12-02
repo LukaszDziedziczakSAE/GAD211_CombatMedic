@@ -45,31 +45,7 @@ void ASoldierAIController::OnPossess(APawn* InPawn)
 			}
 		}
 
-		ASoldierWaypoint* NearestWaypoint = nullptr;
-		float NearestWaypointDistance = 100000;
-		for (ASoldierWaypoint* Waypoint : TravelWaypoints)
-		{
-			float Distance = FVector::Distance(Soldier->GetActorLocation(), Waypoint->GetActorLocation());
-
-			if (NearestWaypoint == nullptr)
-			{
-				NearestWaypoint = Waypoint;
-				NearestWaypointDistance = Distance;
-			}
-
-			else if (Distance < NearestWaypointDistance)
-			{
-				NearestWaypoint = Waypoint;
-				NearestWaypointDistance = Distance;
-			}
-		}
-
-		if (NearestWaypoint != nullptr)
-		{
-			LastTravelWaypointIndex = NearestWaypoint->GetIndex();
-			SetWaypoint(NearestWaypoint->RandomPointInRadius());
-		}
-		else UE_LOG(LogTemp, Error, TEXT("Did not find Nearest Waypoint"));
+		GoToNearestWaypoint();
 	}
 }
 
@@ -115,4 +91,35 @@ void ASoldierAIController::GoToLastWaypointSet()
 			SetWaypoint(Waypoint->RandomPointInRadius());
 		}
 	}
+}
+
+void ASoldierAIController::GoToNearestWaypoint()
+{
+	if (TravelWaypoints.Num() == 0) return;
+
+	ASoldierWaypoint* NearestWaypoint = nullptr;
+	float NearestWaypointDistance = 100000;
+	for (ASoldierWaypoint* Waypoint : TravelWaypoints)
+	{
+		float Distance = FVector::Distance(Soldier->GetActorLocation(), Waypoint->GetActorLocation());
+
+		if (NearestWaypoint == nullptr)
+		{
+			NearestWaypoint = Waypoint;
+			NearestWaypointDistance = Distance;
+		}
+
+		else if (Distance < NearestWaypointDistance)
+		{
+			NearestWaypoint = Waypoint;
+			NearestWaypointDistance = Distance;
+		}
+	}
+
+	if (NearestWaypoint != nullptr)
+	{
+		LastTravelWaypointIndex = NearestWaypoint->GetIndex();
+		SetWaypoint(NearestWaypoint->RandomPointInRadius());
+	}
+	else UE_LOG(LogTemp, Error, TEXT("Did not find Nearest Waypoint"));
 }

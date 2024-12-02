@@ -215,6 +215,18 @@ bool ACombatMedicGameMode::AllAlliesDown()
 	return true;
 }
 
+bool ACombatMedicGameMode::AllAlliesDead()
+{
+	for (ASoldier* Soldier : AliedSoldiers)
+	{
+		if (Soldier->IsAlive())
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 void ACombatMedicGameMode::PlayerEnteredDangerZone()
 {
 	bPlayerDied = true;
@@ -227,9 +239,9 @@ void ACombatMedicGameMode::SoldiersGotToLevelEnd()
 	Cast<ACombatMedic_HUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->ShowEndScreen();
 }
 
-void ACombatMedicGameMode::EndIfAllySoldiersAllDown()
+void ACombatMedicGameMode::EndIfAlliedSoldiersDead()
 {
-	if (!AllAlliesDown()) return;
+	if (!AllAlliesDead()) return;
 	bAllAlliesDown = true;
 	Cast<ACombatMedic_HUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->ShowEndScreen();
 }

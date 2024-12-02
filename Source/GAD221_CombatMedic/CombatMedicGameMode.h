@@ -84,13 +84,16 @@ public:
 	bool AllAlliesDown();
 
 	UFUNCTION(BlueprintCallable)
+	bool AllAlliesDead();
+
+	UFUNCTION(BlueprintCallable)
 	void PlayerEnteredDangerZone();
 
 	UFUNCTION(BlueprintCallable)
 	void SoldiersGotToLevelEnd();
 
 	UFUNCTION(BlueprintCallable)
-	void EndIfAllySoldiersAllDown();
+	void EndIfAlliedSoldiersDead();
 
 	UFUNCTION(BlueprintPure)
 	int GetCombatIndex() { return CombatIndex; }

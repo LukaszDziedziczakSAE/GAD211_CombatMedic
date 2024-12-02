@@ -51,4 +51,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void GoToLastWaypointSet();
+
+	UFUNCTION(BlueprintCallable)
+	void GoToNearestWaypoint();
 };
