@@ -10,6 +10,7 @@
 #include "NiagaraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "SoldierVoiceComponent.h"
 
 // Sets default values for this component's properties
 USoldierCombat::USoldierCombat()
@@ -112,6 +113,7 @@ void USoldierCombat::Fire()
 		}
 
 		ChanceToHit += ChanceToHitIncreasePerShot;
+		Soldier->Voice->PlayCombatHitEnemy();
 	}
 
 	if (MuzzleFlash != nullptr) MuzzleFlash->Activate(true);

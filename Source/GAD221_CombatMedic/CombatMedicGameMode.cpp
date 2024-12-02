@@ -195,9 +195,7 @@ bool ACombatMedicGameMode::AllAlliesStanding()
 {
 	for (ASoldier* Soldier : AliedSoldiers)
 	{
-		if (!Soldier->IsAlive()) continue;
-
-		if (Soldier->IsDowned())
+		if (Soldier->IsAlive() && Soldier->IsDowned())
 		{
 			return false;
 		}

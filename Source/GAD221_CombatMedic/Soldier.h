@@ -204,6 +204,20 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UNiagaraComponent* DeathBleed;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float InjuryHealthDeductionMin{ 50.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float InjuryHealthDeductionMax{ 100.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float InjuryPainDeductionMin{ 50.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float InjuryPainDeductionMax{ 100.0f };
+
+
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

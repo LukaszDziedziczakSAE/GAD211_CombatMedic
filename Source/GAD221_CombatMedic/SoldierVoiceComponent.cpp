@@ -66,6 +66,11 @@ void USoldierVoiceComponent::PlayCombatInProgress()
 	Play(CombatInProgress);
 }
 
+void USoldierVoiceComponent::PlayCombatHitEnemy()
+{
+	Play(CombatHitEnemy);
+}
+
 void USoldierVoiceComponent::PlayGotHit()
 {
 	Play(GotHit);

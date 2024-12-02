@@ -295,10 +295,10 @@ void ASoldier::SetInjury(FInjury NewInjury)
 	bIsDowned = true;
 	if (AI != nullptr) AI->SetIsDowned(bIsDowned);
 	StartBleeding(Injury.BodyPart);
-	float HealthDeduction = UKismetMathLibrary::RandomFloatInRange(100.0f, 200.0f);
+	float HealthDeduction = UKismetMathLibrary::RandomFloatInRange(InjuryHealthDeductionMin, InjuryHealthDeductionMax);
 	CurrentHealth = FMath::Clamp((CurrentHealth - HealthDeduction), 0.0f, MaxHealth);
 
-	float PainDeduction = UKismetMathLibrary::RandomFloatInRange(50.0f, 100.0f);
+	float PainDeduction = UKismetMathLibrary::RandomFloatInRange(InjuryPainDeductionMin, InjuryPainDeductionMax);
 	CurrentPain = FMath::Clamp((CurrentPain + PainDeduction), 0.0f, MaxPain);
 
 	Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->EndIfAllySoldiersAllDown();
@@ -463,7 +463,7 @@ void ASoldier::Death()
 	FTimerHandle DeathBleedTimer;
 	GetWorld()->GetTimerManager().SetTimer(DeathBleedTimer, this , &ASoldier::StartDeathBleed, 1.0f, false);
 
-	//Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->TryEndCombat();
+	Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->TryEndCombat();
 	Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->EndIfAllySoldiersAllDown();
 }
 

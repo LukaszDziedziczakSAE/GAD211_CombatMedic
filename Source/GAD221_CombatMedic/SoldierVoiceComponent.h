@@ -30,6 +30,9 @@ protected:
 	USoundBase* CombatInProgress;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	USoundBase* CombatHitEnemy;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	USoundBase* GotHit;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -62,6 +65,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void PlayCombatInProgress();
+
+	UFUNCTION(BlueprintCallable)
+	void PlayCombatHitEnemy();
 	
 	UFUNCTION(BlueprintCallable)
 	void PlayGotHit();
