@@ -97,4 +97,7 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	int GetCombatIndex() { return CombatIndex; }
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int CurrentTravelIndex;
 };

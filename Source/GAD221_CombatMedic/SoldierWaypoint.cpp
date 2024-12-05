@@ -44,7 +44,7 @@ void ASoldierWaypoint::OnOverlapBegin(UPrimitiveComponent* newComp, AActor* Othe
 	{
 		SoldierInOverlap = Soldier;
 		Soldier->SetCrouching(CrouchingAmmount);
-		//UE_LOG(LogTemp, Warning, TEXT("%s entered %s"), *Soldier->GetName(), *GetName());
+		//UE_LOG(LogTemp, Warning, TEXT("%s entered %s"), *Soldier->GetActorNameOrLabel(), *GetActorNameOrLabel());
 		Soldier->Combat->LookAtFirstFirePosition();
 	}
 }
@@ -60,7 +60,7 @@ void ASoldierWaypoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
 	if (WaypointType == FightingPosition)
 	{
 		Soldier->SetCrouching(0);
-		UE_LOG(LogTemp, Warning, TEXT("%s exited %s"), *Soldier->GetName(), *GetName());
+		//UE_LOG(LogTemp, Warning, TEXT("%s exited %s"), *Soldier->GetActorNameOrLabel(), *GetActorNameOrLabel());
 	}
 }
 

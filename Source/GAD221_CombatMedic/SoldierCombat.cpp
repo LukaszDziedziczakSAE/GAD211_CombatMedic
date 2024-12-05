@@ -34,7 +34,7 @@ void USoldierCombat::BeginPlay()
 	MuzzleFlash = Cast<UNiagaraComponent>(Soldier->GetComponentsByTag(UNiagaraComponent::StaticClass(), TEXT("MuzzleFlash"))[0]);
 	if (MuzzleFlash == nullptr)
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s did not find muzzle flash"), *Soldier->GetName());
+		UE_LOG(LogTemp, Error, TEXT("%s did not find muzzle flash"), *Soldier->GetActorNameOrLabel());
 	}
 
 	FireIndex = FireRate;
@@ -97,23 +97,28 @@ void USoldierCombat::Fire()
 		float Random = UKismetMathLibrary::RandomFloatInRange(0, 1);
 		if (Random <= ChanceToHit)
 		{
-			UE_LOG(LogTemp, Display, TEXT("%s hit %s"), *Soldier->GetName(), *Opponent->GetName());
+			UE_LOG(LogTemp, Display, TEXT("%s hit %s"), *Soldier->GetActorNameOrLabel(), *Opponent->GetActorNameOrLabel());
 			Opponent->SetRandomInjury();
 
 			if (Soldier->SoldierSide == Allied)
 			{
-				Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->TryEndCombat();
+				Soldier->GameMode->TryEndCombat();
+			}
+
+			else if (Soldier->SoldierSide == Enemy)
+			{
 			}
 
 			Opponent = nullptr;
+			Soldier->Voice->PlayCombatHitEnemy();
 		}
 		else
 		{
-			UE_LOG(LogTemp, Display, TEXT("%s missed %s"), *Soldier->GetName(), *Opponent->GetName());
+			UE_LOG(LogTemp, Display, TEXT("%s missed %s"), *Soldier->GetActorNameOrLabel(), *Opponent->GetActorNameOrLabel());
 		}
 
 		ChanceToHit += ChanceToHitIncreasePerShot;
-		Soldier->Voice->PlayCombatHitEnemy();
+		
 	}
 
 	if (MuzzleFlash != nullptr) MuzzleFlash->Activate(true);
@@ -151,7 +156,7 @@ void USoldierCombat::SetOpponentSoldier(ASoldier* OpponentSoldier)
 	if (Opponent == OpponentSoldier) return;
 
 	Opponent = OpponentSoldier;
-	UE_LOG(LogTemp, Warning, TEXT("%s set opponent to %s"), *Soldier->GetName(), *OpponentSoldier->GetName());
+	UE_LOG(LogTemp, Warning, TEXT("%s set opponent to %s"), *Soldier->GetActorNameOrLabel(), *OpponentSoldier->GetActorNameOrLabel());
 
 	if (Soldier->SoldierAI() != nullptr)
 	{
@@ -177,25 +182,29 @@ bool USoldierCombat::TrySetOpponent()
 {
 	if (Opponent != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s already has opponent"), *Soldier->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("%s already has opponent"), *Soldier->GetActorNameOrLabel());
 		return true;
 	}
 	if (FightingPosition == nullptr)
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s FightingPosition missing"), *Soldier->GetName());
+		UE_LOG(LogTemp, Error, TEXT("%s FightingPosition missing"), *Soldier->GetActorNameOrLabel());
 		return false;
 	}
 
-	int MaxLoop = 1000;
-	int Loop = 0;
+	if (Soldier->SoldierSide == Allied && Soldier->GameMode->AllEnemySoldiersDown()) return false;
+	if (Soldier->SoldierSide == Enemy && Soldier->GameMode->AllAlliesDown()) return false;
 
 	if (FightingPosition->TargetFightingPositions.Num() == 0)
 	{
 		SetOpponentSoldier(NearestEnemySoldier());
 		return Opponent != nullptr;
 	}
+	
 	else
 	{
+		int MaxLoop = 1000;
+		int Loop = 0;
+
 		while (Loop < MaxLoop)
 		{
 			for (ASoldierWaypoint* CombatWaypoint : FightingPosition->TargetFightingPositions)
@@ -205,18 +214,12 @@ bool USoldierCombat::TrySetOpponent()
 					SetOpponentSoldier(CombatWaypoint->AssignedSoldier);
 					return true;
 				}
-
-				/*if (CombatWaypoint->SoldierInOverlap != nullptr && !CombatWaypoint->SoldierInOverlap->IsDowned())
-				{
-					SetOpponentSoldier(CombatWaypoint->SoldierInOverlap);
-					return true;
-				}*/
 			}
 			Loop++;
 		}
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Did not find opponent"));
+	UE_LOG(LogTemp, Display, TEXT("%s Did not find opponent"), *Soldier->GetActorNameOrLabel());
 	return false;
 }
 
@@ -232,7 +235,7 @@ void USoldierCombat::LookAtFirstFirePosition()
 	if (FightingPosition == nullptr) return;
 	if (FightingPosition->TargetFightingPositions.Num() == 0)
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s FightingPosition missing Targets"), *FightingPosition->GetName());
+		UE_LOG(LogTemp, Error, TEXT("%s FightingPosition missing Targets"), *FightingPosition->GetActorNameOrLabel());
 		return;
 	}
 

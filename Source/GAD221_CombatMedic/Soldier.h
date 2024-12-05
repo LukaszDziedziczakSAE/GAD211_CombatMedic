@@ -216,8 +216,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float InjuryPainDeductionMax{ 100.0f };
 
-
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -311,4 +309,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USoldierVoiceComponent* Voice;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	ACombatMedicGameMode* GameMode;
 };

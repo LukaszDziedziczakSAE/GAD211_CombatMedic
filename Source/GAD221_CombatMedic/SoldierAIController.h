@@ -54,4 +54,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void GoToNearestWaypoint();
+
+	UFUNCTION(BlueprintCallable)
+	void GoToGameModeLastWaypoint();
 };

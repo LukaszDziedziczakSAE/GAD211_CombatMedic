@@ -7,11 +7,11 @@
 UENUM(BlueprintType)
 enum EMedicalItemType
 {
-	NoType,
-	Bandage,
-	Tourniquet,
-	Gauze,
-	ChestSeal,
-	Scissors,
-	PainKiller
+	NoType UMETA(DisplayName = "No Type"),
+	Bandage UMETA(DisplayName = "Bandage"),
+	Tourniquet UMETA(DisplayName = "Tourniquet"),
+	Gauze UMETA(DisplayName = "Gauze"),
+	ChestSeal UMETA(DisplayName = "Chest Seal"),
+	Scissors UMETA(DisplayName = "Scissors"),
+	PainKiller UMETA(DisplayName = "Pain Killer")
 };

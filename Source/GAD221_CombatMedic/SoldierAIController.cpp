@@ -77,6 +77,8 @@ void ASoldierAIController::SetIsInCombat(bool InCombat)
 void ASoldierAIController::ArrivedAtWaypoint(int WaypointIndex)
 {
 	LastTravelWaypointIndex = WaypointIndex + 1;
+	if (Soldier->GameMode->CurrentTravelIndex < LastTravelWaypointIndex) 
+		Soldier->GameMode->CurrentTravelIndex = LastTravelWaypointIndex;
 	GoToLastWaypointSet();
 }
 
@@ -122,4 +124,10 @@ void ASoldierAIController::GoToNearestWaypoint()
 		SetWaypoint(NearestWaypoint->RandomPointInRadius());
 	}
 	else UE_LOG(LogTemp, Error, TEXT("Did not find Nearest Waypoint"));
+}
+
+void ASoldierAIController::GoToGameModeLastWaypoint()
+{
+	LastTravelWaypointIndex = Soldier->GameMode->CurrentTravelIndex;
+	GoToLastWaypointSet();
 }

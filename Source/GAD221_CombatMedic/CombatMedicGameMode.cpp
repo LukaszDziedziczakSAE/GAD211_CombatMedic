@@ -140,7 +140,7 @@ void ACombatMedicGameMode::BeginCombat(int Index)
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("Ran out of AliedCombatPositions for %s"), *AliedSoldier->GetName());
+			UE_LOG(LogTemp, Error, TEXT("Ran out of AliedCombatPositions for %s"), *AliedSoldier->GetActorNameOrLabel());
 		}
 	}
 
@@ -160,6 +160,9 @@ void ACombatMedicGameMode::BeginCombat(int Index)
 
 void ACombatMedicGameMode::TryEndCombat()
 {
+	UE_LOG(LogTemp, Warning, TEXT("TryEndCombat %d"), CombatIndex);
+	if (CombatIndex == 0 || bAllAlliesDown) return;
+
 	if (AllEnemySoldiersDown() && AllAlliesStanding())
 	{
 		for (ASoldier* Soldier : AliedSoldiers)
@@ -185,9 +188,11 @@ bool ACombatMedicGameMode::AllEnemySoldiersDown()
 	{
 		if (!Combatant->IsDowned())
 		{
+			UE_LOG(LogTemp, Display, TEXT("AllEnemySoldiersDown false"));
 			return false;
 		}
 	}
+	UE_LOG(LogTemp, Display, TEXT("AllEnemySoldiersDown true"));
 	return true;
 }
 
@@ -197,9 +202,11 @@ bool ACombatMedicGameMode::AllAlliesStanding()
 	{
 		if (Soldier->IsAlive() && Soldier->IsDowned())
 		{
+			UE_LOG(LogTemp, Display, TEXT("AllAlliesStanding false"));
 			return false;
 		}
 	}
+	UE_LOG(LogTemp, Display, TEXT("AllAlliesStanding true"));
 	return true;
 }
 
@@ -209,9 +216,11 @@ bool ACombatMedicGameMode::AllAlliesDown()
 	{
 		if (!Soldier->IsDowned() || Soldier->IsAlive())
 		{
+			UE_LOG(LogTemp, Display, TEXT("AllAlliesDown false"));
 			return false;
 		}
 	}
+	UE_LOG(LogTemp, Display, TEXT("AllAlliesDown true"));
 	return true;
 }
 
@@ -221,9 +230,12 @@ bool ACombatMedicGameMode::AllAlliesDead()
 	{
 		if (Soldier->IsAlive())
 		{
+			UE_LOG(LogTemp, Display, TEXT("AllAlliesDead false"));
 			return false;
 		}
 	}
+
+	UE_LOG(LogTemp, Display, TEXT("AllAlliesDead true"));
 	return true;
 }
 

@@ -201,6 +201,7 @@ void ASoldier::BeginPlay()
 	Super::BeginPlay();
 
 	AI = Cast<ASoldierAIController>(GetController());
+	GameMode = Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode());
 
 	if (SoldierSide == Enemy)
 	{
@@ -247,7 +248,7 @@ void ASoldier::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!bIsAlive) return;
+	if (!bIsAlive || SoldierSide != Allied) return;
 
 	if (Injury.BodyPart != None)
 	{
@@ -256,10 +257,11 @@ void ASoldier::Tick(float DeltaTime)
 		if (CurrentHealth == 0)
 		{
 			Death();
+			UE_LOG(LogTemp, Display, TEXT("%s died"), *GetActorNameOrLabel());
 		}
 	}
 
-	else
+	else //Injury.BodyPart == None
 	{
 		if (CurrentHealth < MaxHealth)
 		{
@@ -275,7 +277,8 @@ void ASoldier::Tick(float DeltaTime)
 		{
 			bIsDowned = false;
 			AI->SetIsDowned(bIsDowned);
-			Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->TryEndCombat();
+			UE_LOG(LogTemp, Display, TEXT("%s got back up"), *GetActorNameOrLabel());
+			GameMode->TryEndCombat();
 		}
 	}
 }
@@ -295,6 +298,7 @@ void ASoldier::SetInjury(FInjury NewInjury)
 	bIsDowned = true;
 	if (AI != nullptr) AI->SetIsDowned(bIsDowned);
 	StartBleeding(Injury.BodyPart);
+
 	float HealthDeduction = UKismetMathLibrary::RandomFloatInRange(InjuryHealthDeductionMin, InjuryHealthDeductionMax);
 	CurrentHealth = FMath::Clamp((CurrentHealth - HealthDeduction), 0.0f, MaxHealth);
 
@@ -302,6 +306,8 @@ void ASoldier::SetInjury(FInjury NewInjury)
 	CurrentPain = FMath::Clamp((CurrentPain + PainDeduction), 0.0f, MaxPain);
 
 	Voice->PlayGotHit();
+
+	UE_LOG(LogTemp, Display, TEXT("%s downed"), *GetActorNameOrLabel());
 }
 
 void ASoldier::SetRandomInjury()
@@ -342,12 +348,16 @@ void ASoldier::HealInjury(float Amount)
 	{
 		Voice->PlayGruntingPositive();
 	}
+
+	UE_LOG(LogTemp, Display, TEXT("%s injury healed"), *GetActorNameOrLabel());
 }
 
 void ASoldier::HealPain(float Amount)
 {
 	CurrentPain = FMath::Clamp(CurrentPain - Amount, 0, MaxPain);
 	Voice->PlayGruntingPositive();
+
+	UE_LOG(LogTemp, Display, TEXT("%s pain reduced"), *GetActorNameOrLabel());
 }
 
 void ASoldier::SetCrouching(float Value)
@@ -358,11 +368,11 @@ void ASoldier::SetCrouching(float Value)
 
 void ASoldier::EngageCombat(ASoldierWaypoint* FightingPosition)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("%s combat start"), *GetName());
+	//UE_LOG(LogTemp, Warning, TEXT("%s combat start"), *GetActorNameOrLabel());
 	
 	bIsInCombat = true;
 	if (AI != nullptr) AI->SetIsInCombat(bIsInCombat);
-	else UE_LOG(LogTemp, Error, TEXT("%s missing AI"), *GetName());
+	else UE_LOG(LogTemp, Error, TEXT("%s missing AI"), *GetActorNameOrLabel());
 	Combat->SetFightingPosition(FightingPosition);
 	AdjustMovementSpeed();
 }
@@ -372,7 +382,7 @@ void ASoldier::DisengageCombat()
 	bIsInCombat = false;
 	AI->SetIsInCombat(bIsInCombat);
 	Combat->EndCombat();
-	AI->GoToNearestWaypoint();
+	AI->GoToGameModeLastWaypoint();
 	AdjustMovementSpeed();
 }
 
@@ -452,17 +462,18 @@ void ASoldier::Death()
 	TArray<USkeletalMeshComponent*> ChildrenComponents;
 	GetComponents<USkeletalMeshComponent>(ChildrenComponents);
 
-	//GetMesh()->Stop();
-
 	FVector DeathLocation = GetMesh()->GetRelativeLocation();
-	DeathLocation.Z -= 5;
+	DeathLocation.Z -= 4;
 	GetMesh()->SetRelativeLocation(DeathLocation);
 
 	FTimerHandle DeathBleedTimer;
 	GetWorld()->GetTimerManager().SetTimer(DeathBleedTimer, this , &ASoldier::StartDeathBleed, 1.0f, false);
 
-	Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->TryEndCombat();
-	Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode())->EndIfAlliedSoldiersDead();
+	if (SoldierSide == Allied)
+	{
+		GameMode->EndIfAlliedSoldiersDead();
+		GameMode->TryEndCombat();
+	}
 }
 
 void ASoldier::StartDeathBleed()
