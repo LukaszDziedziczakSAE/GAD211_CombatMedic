@@ -311,5 +311,5 @@ public:
 	class USoldierVoiceComponent* Voice;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	ACombatMedicGameMode* GameMode;
+	class ACombatMedicGameMode* GameMode;
 };

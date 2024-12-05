@@ -62,6 +62,9 @@ protected:
 	UFUNCTION()
 	class ASoldier* RandomSoldierInSquad();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bAllEnemySoldiersDown;
+
 public:
 	virtual void Tick(float DeltaSeconds) override;
 
@@ -100,4 +103,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int CurrentTravelIndex;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class APlayerMedic* PlayerMedic;
 };

@@ -40,6 +40,8 @@ protected:
 	UPROPERTY()
 	bool bSprinting;
 
+	
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -69,6 +71,9 @@ public:
 	bool HasPatient();
 
 	UFUNCTION(BlueprintPure)
+	class ASoldier* GetPatient();
+
+	UFUNCTION(BlueprintPure)
 	float StaminaPercentage() { return Stamina / StaminaMax; }
 
 	UFUNCTION(BlueprintCallable)
@@ -76,5 +81,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void StopSprinting();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class ACombatMedicGameMode* GameMode;
 };
 

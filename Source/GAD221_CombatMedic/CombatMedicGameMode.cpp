@@ -11,6 +11,7 @@
 #include "CombatMedic_HUD.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "SoldierVoiceComponent.h"
+#include "PlayerMedic.h"
 
 ACombatMedicGameMode::ACombatMedicGameMode()
 {
@@ -116,6 +117,7 @@ void ACombatMedicGameMode::BeginCombat(int Index)
 {
 	if (CombatIndex == Index) return;
 	CombatIndex = Index;
+	bAllEnemySoldiersDown = false;
 	UE_LOG(LogTemp, Warning, TEXT("Beginning Fight %d"), CombatIndex);
 
 	TArray<ASoldierWaypoint*> AliedCombatPositions;
@@ -163,7 +165,7 @@ void ACombatMedicGameMode::TryEndCombat()
 	UE_LOG(LogTemp, Warning, TEXT("TryEndCombat %d"), CombatIndex);
 	if (CombatIndex == 0 || bAllAlliesDown) return;
 
-	if (AllEnemySoldiersDown() && AllAlliesStanding())
+	if (AllAlliesStanding() && AllEnemySoldiersDown())
 	{
 		for (ASoldier* Soldier : AliedSoldiers)
 		{
@@ -184,6 +186,8 @@ void ACombatMedicGameMode::TryEndCombat()
 
 bool ACombatMedicGameMode::AllEnemySoldiersDown()
 {
+	if (bAllEnemySoldiersDown) return true;
+
 	for (ASoldier* Combatant : EnemySoldiers)
 	{
 		if (!Combatant->IsDowned())
@@ -193,11 +197,14 @@ bool ACombatMedicGameMode::AllEnemySoldiersDown()
 		}
 	}
 	UE_LOG(LogTemp, Display, TEXT("AllEnemySoldiersDown true"));
+	bAllEnemySoldiersDown = true;
 	return true;
 }
 
 bool ACombatMedicGameMode::AllAlliesStanding()
 {
+	if (PlayerMedic->HasPatient()) return false;
+
 	for (ASoldier* Soldier : AliedSoldiers)
 	{
 		if (Soldier->IsAlive() && Soldier->IsDowned())

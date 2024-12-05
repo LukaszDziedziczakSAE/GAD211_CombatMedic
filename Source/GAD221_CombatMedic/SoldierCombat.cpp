@@ -131,7 +131,6 @@ void USoldierCombat::Fire()
 	if (Soldier->GetCrouching() < CrouchingThreshhold)
 	{
 		Soldier->PlayAnimMontage(StandingShotMontage);
-		
 	}
 	else
 	{

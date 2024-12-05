@@ -474,6 +474,10 @@ void ASoldier::Death()
 		GameMode->EndIfAlliedSoldiersDead();
 		GameMode->TryEndCombat();
 	}
+
+	bCanAffectNavigationGeneration = false;
+	GetCapsuleComponent()->bFillCollisionUnderneathForNavmesh = false;
+	GetCapsuleComponent()->bNavigationRelevant = false;
 }
 
 void ASoldier::StartDeathBleed()

@@ -7,6 +7,8 @@
 #include "CombatMedic_PlayerController.h"
 #include "MedicInventory.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "CombatMedicGameMode.h"
+#include "Soldier.h"
 
 // Sets default values
 APlayerMedic::APlayerMedic()
@@ -30,6 +32,9 @@ void APlayerMedic::BeginPlay()
 	PlayerController = Cast<ACombatMedic_PlayerController>(GetController());
 	Stamina = StaminaMax;
 	StopSprinting();
+
+	GameMode = Cast<ACombatMedicGameMode>(GetWorld()->GetAuthGameMode());
+	if (GameMode != nullptr && GameMode->PlayerMedic == nullptr) GameMode->PlayerMedic = this;
 }
 
 // Called every frame
@@ -85,7 +90,12 @@ bool APlayerMedic::IsProvidingMedicalAid()
 
 bool APlayerMedic::HasPatient()
 {
-	return MedicInteraction->Patient != nullptr;
+	return MedicInteraction->Patient != nullptr && MedicInteraction->Patient->IsDowned();
+}
+
+ASoldier* APlayerMedic::GetPatient()
+{
+	return MedicInteraction->Patient;
 }
 
 void APlayerMedic::StartSprinting()

@@ -10,6 +10,7 @@
 #include "MedicInventory.h"
 #include "ItemPickup.h"
 #include "SoldierVoiceComponent.h"
+#include "CombatMedicGameMode.h"
 
 // Sets default values for this component's properties
 UMedicInteraction::UMedicInteraction()
@@ -39,6 +40,8 @@ void UMedicInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (!bGivingMedicalAid) return;
+
 	if (ApplicationCurrent < MedApplicationTime)
 	{
 		ApplicationCurrent += DeltaTime;
@@ -50,7 +53,7 @@ void UMedicInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		}
 	}
 
-	else if (bGivingMedicalAid && (Patient == nullptr || !Patient->IsDowned() || !Patient->IsAlive()))
+	else if (Patient == nullptr || !Patient->IsDowned() || !Patient->IsAlive())
 	{
 		Interact();
 		Patient = nullptr;
@@ -63,6 +66,7 @@ void UMedicInteraction::Interact()
 
 	if (!bGivingMedicalAid && Patient->IsDowned())
 	{
+		UE_LOG(LogTemp, Display, TEXT("Entering Medical Interaction Mode"));
 		bGivingMedicalAid = true;
 		HUD->ShowMedicInterface();
 		Player->PlayerController->SwitchToPatientCamera();
@@ -71,10 +75,12 @@ void UMedicInteraction::Interact()
 
 	else if (bGivingMedicalAid && ApplicationCurrent == MedApplicationTime)
 	{
+		UE_LOG(LogTemp, Display, TEXT("Exiting Medical Interaction Mode"));
 		bGivingMedicalAid = false;
 		HUD->ShowCombatHUD();
 		Player->PlayerController->SwitchToBackToMainCamera();
 		Patient->Voice->bPlayGrunting = false;
+		Player->GameMode->TryEndCombat();
 	}
 }
 
@@ -128,20 +134,23 @@ void UMedicInteraction::CompleteMedicalItemApplication()
 {
 	if (BodyPartSelected == None) return;
 
-	if (InteractionType == PainKiller)
+	if (Patient != nullptr && bGivingMedicalAid)
 	{
-		Patient->HealPain(AmountByAffect(InteractionType, BodyPartSelected));
+		if (InteractionType == PainKiller)
+		{
+			Patient->HealPain(AmountByAffect(InteractionType, BodyPartSelected));
+		}
+
+		else
+		{
+			float HealAmount = AmountByAffect(InteractionType, BodyPartSelected);
+
+			if (HealAmount > 0) Patient->HealInjury(HealAmount);
+			else Patient->Voice->PlayGruntingNegative();
+		}
+
+		Player->MedicInventory->UseItemType(InteractionType);
 	}
-
-	else
-	{
-		float HealAmount = AmountByAffect(InteractionType, BodyPartSelected);
-
-		if (HealAmount > 0) Patient->HealInjury(HealAmount);
-		else Patient->Voice->PlayGruntingNegative();
-	}
-
-	Player->MedicInventory->UseItemType(InteractionType);
 
 	BodyPartSelected = None;
 	InteractionType = NoType;
